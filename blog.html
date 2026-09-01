@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Blog — Volkan Tuncer</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/components.js"></script>
+</head>
+<body>
+  <canvas id="space-canvas"></canvas>
+  <div class="side-stars side-stars-left"></div><div class="side-stars side-stars-right"></div>
+  <div class="scroll-progress"><span></span></div>
+  <canvas id="cur-ripple-canvas"></canvas><div id="cur-wrap"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+
+  <site-header></site-header>
+
+  <div class="page" style="display:flex; flex-direction:column; min-height:100vh;">
+    <div class="page-header reveal d1">
+      <h1>Blog & Makaleler</h1>
+      <p>Mühendislik, donanım mimarileri, Linux ekosistemi ve düşüncelerim üzerine yazılar.</p>
+    </div>
+    <section class="section" style="flex:1;">
+      <div class="section-inner" style="padding-top: 40px;">
+        <div class="blog-grid reveal d2">
+
+          <!-- Örnek Blog Yazıları -->
+          <a href="#" class="blog-card">
+            <span class="blog-date">10 Mayıs 2026</span>
+            <h3 class="blog-title">Gömülü Sistemlerde C Kullanımının Avantajları</h3>
+            <p class="blog-excerpt">Neden hala C kullanıyoruz? Donanıma doğrudan müdahale edebilmenin ve bellek yönetiminin mikrodenetleyiciler üzerindeki kritik önemi.</p>
+          </a>
+
+          <a href="#" class="blog-card">
+            <span class="blog-date">22 Nisan 2026</span>
+            <h3 class="blog-title">Kendi Fikir Günlüğümü Bash Script ile Yazmak</h3>
+            <p class="blog-excerpt">Terminal üzerinden aklıma gelen iş ve mühendislik fikirlerini hızlıca loglamak için yazdığım fikir.sh otomasyonunun detayları.</p>
+          </a>
+
+          <a href="#" class="blog-card">
+            <span class="blog-date">15 Mart 2026</span>
+            <h3 class="blog-title">Merkezi Finans ve Alternatif Ekonomiler</h3>
+            <p class="blog-excerpt">Dijital bankacılık sistemlerindeki veri yönetimi ve alternatif değerli maden destekli ekonomi modelleri üzerine bir eleştiri.</p>
+          </a>
+
+        </div>
+      </div>
+    </section>
+    <site-footer></site-footer>
+  </div>
+  <script src="js/main.js"></script>
+</body>
+</html>
