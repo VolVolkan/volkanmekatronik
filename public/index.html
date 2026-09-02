@@ -3,19 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Volkan Tuncer — Mekatronik Mühendisi</title>
 
-  <!-- FAVICON & GOOGLE ICONS -->
+  <!-- TEMEL SEO METATAGLARI -->
+  <title>Volkan Tuncer — Mekatronik Mühendisi | Eskişehir Gömülü Sistemler & Robotik</title>
+  <meta name="description" content="Eskişehir merkezli Mekatronik Mühendisi Volkan Tuncer. Gömülü sistemler, C/Python yazılım, KiCad PCB tasarımı, otomasyon ve robotik sistem entegrasyonu çözümleri.">
+  <meta name="keywords" content="Volkan Tuncer, Mekatronik Mühendisi, Eskişehir Mekatronik, Gömülü Sistemler, PCB Tasarımı, KiCad, C Programlama, Python Otomasyon, Robotik Sistemler, Karabük Üniversitesi">
+  <meta name="author" content="Volkan Tuncer">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://volkanmekatronik.com.tr/">
+
+  <!-- İKON VE FAVICON AYARLARI (vmico.webp) -->
   <link rel="icon" type="image/webp" href="vmico.webp">
   <link rel="shortcut icon" type="image/webp" href="vmico.webp">
   <link rel="apple-touch-icon" href="vmico.webp">
 
-  <!-- OPEN GRAPH / SOSYAL MEDYA & GOOGLE ARAMA ÖNİZLEMESİ -->
-  <meta property="og:title" content="Volkan Tuncer — Mekatronik Mühendisi">
-  <meta property="og:image" content="https://sitenizindomani.com/vmico.webp">
+  <!-- OPEN GRAPH / SOSYAL MEDYA (WhatsApp, LinkedIn, Twitter, Facebook Önizlemeleri) -->
+  <meta property="og:site_name" content="Volkan Tuncer — Mekatronik Mühendisi">
+  <meta property="og:title" content="Volkan Tuncer — Mekatronik Mühendisi | Eskişehir">
+  <meta property="og:description" content="Gömülü sistemler, PCB tasarımı, C/Python yazılım ve robotik otomasyon alanında mühendislik çözümleri.">
+  <meta property="og:image" content="https://volkanmekatronik.com.tr/vmico.webp">
+  <meta property="og:image:type" content="image/webp">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://volkanmekatronik.com.tr/">
+  <meta property="og:locale" content="tr_TR">
 
+  <!-- TWITTER CARD -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Volkan Tuncer — Mekatronik Mühendisi">
+  <meta name="twitter:description" content="Gömülü sistemler, PCB tasarımı ve otomasyon alanında mühendislik çözümleri.">
+  <meta name="twitter:image" content="https://volkanmekatronik.com.tr/vmico.webp">
+
+  <!-- GOOGLE SCHEMA.ORG (Bölgesel İşletme & Kişisel SEO Entegrasyonu) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Volkan Tuncer",
+    "url": "https://volkanmekatronik.com.tr/",
+    "image": "https://volkanmekatronik.com.tr/vmico.webp",
+    "jobTitle": "Mekatronik Mühendisi",
+    "alumniOf": {
+      "@type": "CollegeOrUniversity",
+      "name": "Karabük Üniversitesi"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Eskişehir",
+      "addressCountry": "TR"
+    },
+    "telephone": "+905057619108",
+    "email": "volkan.tuncer.mekatronik@gmail.com",
+    "knowsAbout": [
+      "Mekatronik Mühendisliği",
+      "Gömülü Sistemler",
+      "PCB Tasarımı",
+      "C Programlama",
+      "Python",
+      "Web sitesi",
+      "Robotik Entegrasyonu",
+      "Otomasyon"
+    ]
+  }
+  </script>
+
+  <!-- FONTLAR VE STİLLER -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/components.js"></script>
@@ -31,7 +86,7 @@
   <!-- MASTER HEADER -->
   <site-header></site-header>
 
-  <div class="page">
+  <main class="page">
     <section id="home">
       <div class="hero-ruler">
         <div class="ruler-tick big" style="margin-top:0"><span>00</span></div>
@@ -49,10 +104,10 @@
           <span class="blink-dot"></span>
           <span class="hero-status-text" data-i18n="hero_status">Hoşgeldiniz &nbsp;—&nbsp; KARABÜK ÜNİVERSİTESİ</span>
         </div>
-        <div class="hero-heading">
+        <h1 class="hero-heading">
           <span class="hero-h-first">Volkan</span>
           <span class="hero-h-last">Tuncer</span>
-        </div>
+        </h1>
         <div class="hero-spec">
           <span class="hl">BÖLÜM :</span> Mekatronik Mühendisliği
           <span class="sep">//</span>
@@ -63,7 +118,7 @@
           <span class="hl">ODAK :</span> Gömülü Sistemler &nbsp;·&nbsp; PCB &nbsp;·&nbsp; Robotik
         </div>
         <p class="hero-desc" data-i18n="hero_desc">
-         Teknolojinin yalnızca nasıl çalıştığını değil, nasıl bir sisteme dönüştürülebileceğini anlamaya odaklanıyorum. Devrelerden yazılıma, otomasyondan sistem entegrasyonuna kadar farklı disiplinleri bir araya getirerek teknik çözümleri yönetilebilir ve sürdürülebilir yapılara dönüştürüyorum. Benim için mühendislik, yalnızca üretmek değil; doğru teknolojiyi seçmek, doğru insan ve kaynakları bir araya getirmek ve ortaya ölçülebilir bir sonuç çıkarmaktır.
+          Teknolojinin yalnızca nasıl çalıştığını değil, nasıl bir sisteme dönüştürülebileceğini anlamaya odaklanıyorum. Devrelerden yazılıma, otomasyondan sistem entegrasyonuna kadar farklı disiplinleri bir araya getirerek teknik çözümleri yönetilebilir ve sürdürülebilir yapılara dönüştürüyorum. Eskişehir merkezli yürütmeyi hedeflediğim mühendislik vizyonumla; doğru teknolojiyi seçmek, doğru kaynakları bir araya getirmek ve ölçülebilir sonuçlar üretmek üzerine çalışıyorum.
         </p>
         <div class="hero-btns">
           <a href="projeler.html" class="btn btn-primary" data-i18n="hero_btn1">Projeleri İncele</a>
@@ -96,7 +151,6 @@
           <div class="tb-row"><div class="tb-head"><span class="tb-name">Siemens NX</span><span class="tb-pct">70%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 70% !important;"></div></div></div>
           <div class="tb-row"><div class="tb-head"><span class="tb-name">PCB Tasarımı</span><span class="tb-pct">45%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 75% !important;"></div></div></div>
           <div class="tb-row"><div class="tb-head"><span class="tb-name">C</span><span class="tb-pct">45%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 65% !important;"></div></div></div>
-
         </div>
       </div>
     </section>
@@ -109,7 +163,7 @@
             <div class="portrait-frame">
               <div class="portrait-corner tl"></div><div class="portrait-corner tr"></div>
               <div class="portrait-corner bl"></div><div class="portrait-corner br"></div>
-              <img src="pictures/mavi.webp" alt="Volkan Tuncer">
+              <img src="pictures/mavi.webp" alt="Volkan Tuncer — Mekatronik Mühendisi" width="400" height="400" loading="lazy">
             </div>
             <div class="portrait-badge">KBÜ / MKT-ENG</div>
           </div>
@@ -117,17 +171,15 @@
             <div class="s-label reveal" data-i18n="about_label"><span class="s-num">01 /</span> Hakkımda</div>
             <h2 class="s-title reveal d1" data-i18n="about_title">Nasıl <em>Biri?</em></h2>
             <p class="reveal d2" data-i18n="about_p1">Küçüklüğümden beri bir şeylerin nasıl çalıştığına dair merakım hiç bitmedi. Bir sistemi oluşturan parçaların nasıl bir araya geldiğini anlamak ve onları birlikte çalışırken görmek her zaman ilgimi çekti. Mekatronik mühendisliği de bu merakın doğal karşılığı oldu — elektronik, mekanik ve yazılımın kesişiminde çalışmak bana hem mantıklı hem de doğal geliyor. Zamanla bu merak, yalnızca sistemleri anlamaktan çok, onları bir bütün olarak düşünmeye ve ortaya çıkan sonucu yönetmeye dönüştü.</p>
-<div class="reveal d3" data-i18n="about_p2">
-  <p>Multidisipliner bir yaklaşımla; gömülü sistemler, donanım tasarımı ve yazılım geliştirme alanlarını uçtan uca entegre eden sistem odaklı bir mühendisim.</p>
-
-  <ul class="about-highlights">
-    <li><strong>Yazılım &amp; Sistemler:</strong> C ve Python odaklı mimariler, ileri seviye Linux ekosistemi ve Selenium otomasyonları.</li>
-    <li><strong>Gömülü &amp; Tasarım:</strong> KiCad ile PCB tasarımı, SolidWorks ile mekanik modelleme, gömülü C programlama, Arduino ve Raspberry Pi mimarileri.</li>
-    <li><strong>Sistem Entegrasyonu:</strong> Münferit teknolojileri tek başına kullanmak yerine; donanım, gömülü yazılım ve otomasyon katmanlarını ihtiyaca uygun şekilde bir araya getirerek uçtan uca çalışan çözümler üretme yaklaşımı.</li>
-    <li><strong>Dil Yeterlilikleri:</strong> Türkçe (Ana Dil), İngilizce (Aktif / İş Düzeyi), Almanca (Öğrenim Aşamasında).</li>
-  </ul>
-</div>
-<div class="reveal d4">
+            <div class="reveal d3" data-i18n="about_p2">
+              <p>Multidisipliner bir yaklaşımla; gömülü sistemler, donanım tasarımı ve yazılım geliştirme alanlarını uçtan uca entegre eden sistem odaklı bir mühendisim.</p>
+              <ul class="about-highlights">
+                <li><strong>Yazılım &amp; Sistemler:</strong> C ve Python odaklı mimariler, ileri seviye Linux ekosistemi ve Selenium otomasyonları.</li>
+                <li><strong>Gömülü &amp; Tasarım:</strong> KiCad ile PCB tasarımı, SolidWorks ile mekanik modelleme, gömülü C programlama, Arduino ve Raspberry Pi mimarileri.</li>
+                <li><strong>Sistem Entegrasyonu:</strong> Münferit teknolojileri tek başına kullanmak yerine; donanım, gömülü yazılım ve otomasyon katmanlarını ihtiyaca uygun şekilde bir araya getirerek uçtan uca çalışan çözümler üretme yaklaşımı.</li>
+                <li><strong>Dil Yeterlilikleri:</strong> Türkçe (Ana Dil), İngilizce (Aktif / İş Düzeyi), Almanca (Öğrenim Aşamasında).</li>
+              </ul>
+            </div>
             <div class="reveal d4">
               <div class="tech-label">// Teknik Ekosistem</div>
               <div class="tags">
@@ -144,23 +196,23 @@
 
     <div class="s-divider"></div>
     <section class="section">
-      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/electronic.webp" alt=""></div>
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/electronic.webp" alt="Mekatronik ve Elektronik Tasarım" loading="lazy"></div>
       <div class="section-inner">
         <div class="s-label reveal" data-i18n="proj_sec_label"><span class="s-num">02 /</span> Projeler (Özet)</div>
         <h2 class="s-title reveal d1" data-i18n="proj_sec_title">Öne Çıkan <em>Çalışmalar</em></h2>
         <div class="proj-grid reveal d2">
-          <a class="proj-card" href="#">
+          <a class="proj-card" href="projeler.html">
             <div class="proj-top-line"></div>
-            <div class="proj-img-wrap"><img src="pictures/project1.webp" alt="ASP.NET Alışveriş Sitesi" class="proj-img"></div>
+            <div class="proj-img-wrap"><img src="pictures/project1.webp" alt="ASP.NET Alışveriş Sitesi Projesi" class="proj-img" loading="lazy"></div>
             <div class="proj-body">
               <div class="proj-meta"><span class="proj-idx">PRJ-001</span><div class="proj-sep"></div><span class="proj-cat">Web · ASP.NET</span></div>
               <div class="proj-name">Alışveriş Sitesi</div>
               <div class="proj-cta" data-i18n="proj_cta">PDF Raporunu Gör</div>
             </div>
           </a>
-          <a class="proj-card" href="#">
+          <a class="proj-card" href="projeler.html">
             <div class="proj-top-line"></div>
-            <div class="proj-img-wrap"><img src="pictures/project3.webp" alt="PCB Tasarımı" class="proj-img"></div>
+            <div class="proj-img-wrap"><img src="pictures/project3.webp" alt="KiCad PCB Devre Tasarımı Projesi" class="proj-img" loading="lazy"></div>
             <div class="proj-body">
               <div class="proj-meta"><span class="proj-idx">PRJ-003</span><div class="proj-sep"></div><span class="proj-cat">Elektronik · KiCad</span></div>
               <div class="proj-name">Devre Tasarımı, Test &amp; PCB</div>
@@ -174,16 +226,16 @@
 
     <div class="s-divider"></div>
     <section class="section">
-      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/mechanic.webp" alt=""></div>
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/mechanic.webp" alt="Mekanik Tasarım Görseli" loading="lazy"></div>
       <div class="section-inner">
         <div class="s-label reveal" data-i18n="gal_sec_label"><span class="s-num">03 /</span> Galeri (Özet)</div>
         <h2 class="s-title reveal d1" data-i18n="gal_sec_title">Anlık <em>Kareler</em></h2>
         <div class="gal-grid reveal d2">
-          <div class="gi gi-tall"><a href="galeri.html"><img src="pictures/gallery1.webp" alt="Galeri 1"><div class="gi-label" data-i18n="gal_all">Tümünü Gör</div></a></div>
-          <div class="gi"><a href="galeri.html"><img src="pictures/gallery2.webp" alt="Galeri 2"></a></div>
-          <div class="gi"><a href="galeri.html"><img src="pictures/gallery3.webp" alt="Galeri 3"></a></div>
-           <div class="gi"><a href="galeri.html"><img src="pictures/gallery/{03}.webp" alt="Galeri 4"></a></div>
-            <div class="gi"><a href="galeri.html"><img src="pictures/gallery/{01}.webp" alt="Galeri 5"></a></div>
+          <div class="gi gi-tall"><a href="galeri.html"><img src="pictures/gallery1.webp" alt="Volkan Tuncer Çalışma Anı 1" loading="lazy"><div class="gi-label" data-i18n="gal_all">Tümünü Gör</div></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery2.webp" alt="Mekatronik Atölye Çalışması" loading="lazy"></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery3.webp" alt="Elektronik Devre Test Çalışması" loading="lazy"></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery/03.webp" alt="PCB Lehimleme ve Tasarım" loading="lazy"></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery/01.webp" alt="Robotik Proje Görseli" loading="lazy"></a></div>
         </div>
         <a href="galeri.html" class="btn btn-ghost reveal d3" data-i18n="gal_all_btn">Galerinin Tamamına Git &rarr;</a>
       </div>
@@ -191,14 +243,14 @@
 
     <div class="s-divider"></div>
     <section id="contact" class="section">
-      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/world.webp" alt=""></div>
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/world.webp" alt="İletişim Görseli" loading="lazy"></div>
       <div class="section-inner">
         <div class="s-label reveal" data-i18n="contact_label"><span class="s-num">04 /</span> İletişim</div>
         <h2 class="s-title reveal d1" data-i18n="contact_title">Bağlantı <em>Kurun</em></h2>
-        <p class="contact-lead reveal d2" data-i18n="contact_lead">Proje fikri, teknik soru veya sadece merhaba — aşağıdaki kanallardan ulaşabilirsiniz.</p>
+        <p class="contact-lead reveal d2" data-i18n="contact_lead">Eskişehir veya Türkiye genelinde mühendislik projeleri, teknik sorular veya iş birlikleri için aşağıdaki kanallardan ulaşabilirsiniz.</p>
         <div class="contact-grid reveal d3">
-          <div class="c-card"><div class="c-type">Telegram</div><a class="c-val" href="https://t.me/sescientist" target="_blank">@sescientist</a></div>
-          <div class="c-card"><div class="c-type">Telegram Medya Kanalı</div><a class="c-val" href="https://t.me/bilimadimlari" target="_blank">@bilimadimlari</a></div>
+          <div class="c-card"><div class="c-type">Telegram</div><a class="c-val" href="https://t.me/sescientist" target="_blank" rel="noopener">@sescientist</a></div>
+          <div class="c-card"><div class="c-type">Telegram Medya Kanalı</div><a class="c-val" href="https://t.me/bilimadimlari" target="_blank" rel="noopener">@bilimadimlari</a></div>
           <div class="c-card"><div class="c-type">Gmail</div><a class="c-val" href="mailto:volkan.tuncer.mekatronik@gmail.com">volkan.tuncer.mekatronik@gmail.com</a></div>
           <div class="c-card"><div class="c-type">Duck Mail</div><a class="c-val" href="mailto:volkantuncer@duck.com">volkantuncer@duck.com</a></div>
           <div class="c-card full">
@@ -208,7 +260,7 @@
         </div>
       </div>
     </section>
-  </div>
+  </main>
 
   <!-- MASTER FOOTER -->
   <site-footer></site-footer>
