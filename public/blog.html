@@ -2,9 +2,30 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog — Volkan Tuncer</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/components.js"></script>
+  <style>
+    .blog-img-wrap {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid var(--line2, rgba(255,255,255,0.08));
+    }
+    .blog-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      display: block;
+    }
+    .blog-card:hover .blog-img {
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
   <canvas id="space-canvas"></canvas>
@@ -23,51 +44,76 @@
       <div class="section-inner" style="padding-top: 40px;">
         <div class="blog-grid reveal d2">
 
+          <!-- Tesla Bobini -->
           <a href="tesla-bobini.html" class="blog-card">
-            <span class="blog-date">2 Eylul 2026</span>
+            <div class="blog-img-wrap">
+              <img src="pictures/blog/tesla-bobini.jpg" alt="Tesla Bobini" class="blog-img">
+            </div>
+            <span class="blog-date">2 Eylül 2026</span>
             <h3 class="blog-title">Görsel Şölenin Arkasındaki Deha: Tesla Bobini Nedir, Nasıl Çalışır?</h3>
             <p class="blog-excerpt">Tesla bobinin çalışma mekanizması</p>
           </a>
 
+          <!-- Meryemana Dikeni -->
           <a href="meryemane-dikeni.html" class="blog-card">
-            <span class="blog-date">2 Eylul 2026</span>
+            <div class="blog-img-wrap">
+              <img src="pictures/blog/meryemana_.webp" alt="Meryemana Dikeni" class="blog-img">
+            </div>
+            <span class="blog-date">2 Eylül 2026</span>
             <h3 class="blog-title">Efsaneden Mikroskoba: Meryemana Dikeninin Büyüleyici Dünyası</h3>
             <p class="blog-excerpt">Deve Dikeninin güzel Tarihi ve Biyolojik dünyası</p>
           </a>
 
+          <!-- Elektrikli mi Fosil mi -->
           <a href="elektrikli-fosil.html" class="blog-card">
-            <span class="blog-date">2 Eylul 2026</span>
+            <div class="blog-img-wrap">
+              <img src="pictures/blog/elektrik-motoru.webp" alt="Elektrik Motoru" class="blog-img">
+            </div>
+            <span class="blog-date">2 Eylül 2026</span>
             <h3 class="blog-title">Elektrikli mi, Fosil mi? Geleceğin Ulaşım Teknolojilerine Derin Bir Bakış</h3>
             <p class="blog-excerpt">Elektrikli araçlarla fosil araçları yan yana koyup tartıyoruz.</p>
           </a>
 
+          <!-- Germanyum -->
           <a href="germanyum-32.html" class="blog-card">
-            <span class="blog-date">2 Eylul 2026</span>
+            <div class="blog-img-wrap">
+              <img src="pictures/blog/germanyum.webp" alt="Germanyum" class="blog-img">
+            </div>
+            <span class="blog-date">2 Eylül 2026</span>
             <h3 class="blog-title">Geleceğin Çatışma Sebebi mi? Periyodik Cetvelin Gizli Stratejisti: Germanyum</h3>
             <p class="blog-excerpt">Silikondan bahsederken unuttuğumuz ama unutmamamız gereken bir yarıiletkenin hikayesi.</p>
           </a>
 
+          <!-- Tesla Termomanyetik -->
           <a href="tesla-termomanyetik.html" class="blog-card">
-            <span class="blog-date">2 Eylul 2026</span>
+            <div class="blog-img-wrap">
+              <img src="pictures/blog/tesla-termomanyetik.webp" alt="Tesla Termomanyetik Motor" class="blog-img">
+            </div>
+            <span class="blog-date">2 Eylül 2026</span>
             <h3 class="blog-title">Isıdan Harekete: Nikola Tesla ve Termo-Manyetik Motorun Büyüleyici Hikayesi</h3>
             <p class="blog-excerpt">Teslanın İnanılmaz Isı-Hareket Dönüşüm Makinesi</p>
           </a>
 
-
+          <!-- RGB Ekranlar (Uygun kapak görseli olmadığı için şimdilik boş bırakıldı veya genel görsel konabilir) -->
           <a href="rgb-ekran.html" class="blog-card">
+            <div class="blog-img-wrap">
+              <img src="pictures/blog_RGB_ekran.webp" alt="RGB Ekran" class="blog-img">
+            </div>
             <span class="blog-date">2 Eylül 2026</span>
+
             <h3 class="blog-title">RGB Ekranlar Nasıl Çalışır ve 16'lık Renk İfade Sistemi</h3>
-            <p class="blog-excerpt">Tüm renkler üç ana rengin farklı tonlarda karışımıyla oluşur(Bilgisayar Dünyasında) </p>
+            <p class="blog-excerpt">Tüm renkler üç ana rengin farklı tonlarda karışımıyla oluşur (Bilgisayar Dünyasında)</p>
           </a>
 
+          <!-- Sera Sineki -->
           <a href="sera-sinekleri.html" class="blog-card">
+            <div class="blog-img-wrap">
+              <img src="pictures/blog/beyazsinek.webp" alt="Sera Sineği / Beyazsinek" class="blog-img">
+            </div>
             <span class="blog-date">22 Ocak 2022</span>
             <h3 class="blog-title">Sera Sineği Baskını</h3>
             <p class="blog-excerpt">Bitkilerime musallat olan sinekleri bilimsel inceleme kadavralarıma çeviriyorum.</p>
           </a>
-
-
-
 
         </div>
       </div>
