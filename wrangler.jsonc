@@ -6,7 +6,13 @@
     "directory": ".",
     "exclude": [
       ".git/**",
-      "node_modules/**"
+      "node_modules/**",
+      "myenv/**",
+      ".venv/**",
+      "venv/**",
+      "__pycache__/**",
+      "*.pyc",
+      ".DS_Store"
     ]
   }
 }
