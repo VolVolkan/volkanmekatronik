@@ -1,18 +1,7 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "volkanmekatronik",
-  "compatibility_date": "2026-08-31",
+  "name": "proje-adin",
+  "compatibility_date": "2026-09-02",
   "assets": {
-    "directory": ".",
-    "exclude": [
-      ".git/**",
-      "node_modules/**",
-      "myenv/**",
-      ".venv/**",
-      "venv/**",
-      "__pycache__/**",
-      "*.pyc",
-      ".DS_Store"
-    ]
+    "directory": "./" // Veya sitenin dosyaları 'public'/'dist' içindeyse "./public" yap
   }
 }
