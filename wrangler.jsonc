@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "volkanmekatronik",
+  "compatibility_date": "2026-08-31",
+  "assets": {
+    "directory": ".",
+    "exclude": [
+      ".git/**",
+      "node_modules/**"
+    ]
+  }
+}
