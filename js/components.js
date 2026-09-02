@@ -79,7 +79,7 @@ const footerTemplate = `
 
 <div class="footer-content">
 <div class="foot-l" data-i18n="footer_copy" style="position: relative; z-index: 10;">© 2026 Volkan Tuncer — Karabük Üniversitesi · Mekatronik Mühendisliği</div>
-<div class="foot-r" style="position: relative; z-index: 10;"><span class="foot-dot"></span> <span data-i18n="footer_sys">sistem aktif</span></div>
+<div class="foot-r" style="position: relative; z-index: 10;"><span class="foot-dot"></span> <span data-i18n="footer_sys">Canlı</span></div>
 </div>
 </footer>
 `;
@@ -88,51 +88,90 @@ class SiteHeader extends HTMLElement {
   connectedCallback() {
     this.innerHTML = headerTemplate;
 
-    // Aktif linki belirleme
-    const currentPage = window.location.pathname.split("/").pop();
-    const links = this.querySelectorAll('nav ul a');
-    links.forEach(link => {
-      if(link.getAttribute('href') === currentPage || (currentPage === '' && link.getAttribute('href') === 'index.html')) {
-        link.classList.add('active');
+    // 1. Aktif Linki Belirleme (Query parametreleri ve Hash'i temizleyerek eşleştirir)
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    const links = this.querySelectorAll("nav ul a, .nav-mobile-menu a");
+    links.forEach((link) => {
+      const href = link.getAttribute("href");
+      if (
+        href === currentPage ||
+        (currentPage === "index.html" && href === "index.html")
+      ) {
+        link.classList.add("active");
       }
     });
 
-    // Mobil Menü
-    const hamburger = this.querySelector('#hamburger');
-    const mobileMenu = this.querySelector('#mobile-menu');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      mobileMenu.classList.toggle('open');
-    });
+    // 2. Mobil Menü Mantığı
+    const hamburger = this.querySelector("#hamburger");
+    const mobileMenu = this.querySelector("#mobile-menu");
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("open");
+        mobileMenu.classList.toggle("open");
+      });
 
-    const mobileLinks = this.querySelectorAll('.nav-mobile-menu a');
-    mobileLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        hamburger.classList.remove('open');
-        mobileMenu.classList.remove('open');
+      const mobileLinks = this.querySelectorAll(".nav-mobile-menu a");
+      mobileLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+          hamburger.classList.remove("open");
+          mobileMenu.classList.remove("open");
+        });
+      });
+    }
+
+    // 3. Tema Değiştirici Mantığı
+    const root = document.documentElement;
+    const themeToggle = this.querySelector("#theme-toggle");
+
+    const setTheme = (theme) => {
+      if (theme === "light") root.setAttribute("data-theme", "light");
+      else root.removeAttribute("data-theme");
+      try {
+        localStorage.setItem("theme", theme);
+      } catch (e) {}
+    };
+
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        const isLight = root.getAttribute("data-theme") === "light";
+        setTheme(isLight ? "dark" : "light");
+      });
+    }
+
+    // Kayıtlı Temayı Uygula
+    try {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "light") root.setAttribute("data-theme", "light");
+    } catch (e) {}
+
+    // 4. Dil Değiştirici (Lang Switch) Mantığı
+    const langBtns = this.querySelectorAll(".lang-btn");
+    const setLanguage = (lang) => {
+      langBtns.forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
+      });
+      try {
+        localStorage.setItem("preferred_lang", lang);
+      } catch (e) {}
+
+      // i18n sistemi varsa tetikle
+      if (typeof window.changeLanguage === "function") {
+        window.changeLanguage(lang);
+      }
+    };
+
+    langBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const selectedLang = btn.getAttribute("data-lang");
+        setLanguage(selectedLang);
       });
     });
 
-    // Tema Değiştirici
-    const root = document.documentElement;
-    const themeToggle = this.querySelector('#theme-toggle');
-    function setTheme(theme) {
-      if (theme === 'light') root.setAttribute('data-theme', 'light');
-      else root.removeAttribute('data-theme');
-      try { localStorage.setItem('theme', theme); } catch (e) {}
-    }
-    themeToggle.addEventListener('click', () => {
-      const isLight = root.getAttribute('data-theme') === 'light';
-      setTheme(isLight ? 'dark' : 'light');
-    });
-
-    // Kayıtlı Temayı Yükle
-    (function () {
-      try {
-        var saved = localStorage.getItem('theme');
-        if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
-      } catch (e) {}
-    })();
+    // Kayıtlı Dili Yükle
+    try {
+      const savedLang = localStorage.getItem("preferred_lang") || "tr";
+      setLanguage(savedLang);
+    } catch (e) {}
   }
 }
 
@@ -142,6 +181,6 @@ class SiteFooter extends HTMLElement {
   }
 }
 
-// BİLEŞENLERİ SİSTEME TANITMA (Bunlar silinirse Header/Footer yok olur)
-customElements.define('site-header', SiteHeader);
-customElements.define('site-footer', SiteFooter);
+// BİLEŞENLERİ SİSTEME TANITMA
+customElements.define("site-header", SiteHeader);
+customElements.define("site-footer", SiteFooter);

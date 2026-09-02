@@ -1,193 +1,205 @@
-  <!DOCTYPE html>
-  <html lang="tr">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volkan Tuncer — Mekatronik Mühendisi</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/components.js"></script>
-  </head>
-  <body>
-    <canvas id="space-canvas"></canvas>
-    <div class="side-stars side-stars-left" aria-hidden="true"></div>
-    <div class="side-stars side-stars-right" aria-hidden="true"></div>
-    <div class="scroll-progress" aria-hidden="true"><span></span></div>
-    <canvas id="cur-ripple-canvas"></canvas>
-    <div id="cur-wrap"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volkan Tuncer — Mekatronik Mühendisi</title>
 
-    <!-- MASTER HEADER -->
-    <site-header></site-header>
+  <!-- FAVICON & GOOGLE ICONS -->
+  <link rel="icon" type="image/webp" href="vmico.webp">
+  <link rel="shortcut icon" type="image/webp" href="vmico.webp">
+  <link rel="apple-touch-icon" href="vmico.webp">
 
-    <div class="page">
-      <section id="home">
-        <div class="hero-ruler">
-          <div class="ruler-tick big" style="margin-top:0"><span>00</span></div>
-          <div style="flex:1; width:1px; background:var(--line); margin: 6px auto;"></div>
-          <div class="ruler-tick"><span>10</span></div>
-          <div style="flex:1; width:1px; background:var(--line); margin: 6px auto;"></div>
-          <div class="ruler-tick big"><span>20</span></div>
-          <div style="flex:1; width:1px; background:var(--line); margin: 6px auto;"></div>
-          <div class="ruler-tick"><span>30</span></div>
-          <div style="flex:1; width:1px; background:var(--line); margin: 6px auto;"></div>
-          <div class="ruler-tick big"><span>40</span></div>
-        </div>
-        <div class="hero-center">
-          <div class="hero-status">
-            <span class="blink-dot"></span>
-            <span class="hero-status-text" data-i18n="hero_status">SİSTEM AKTİF &nbsp;—&nbsp; KARABÜK ÜNİVERSİTESİ</span>
-          </div>
-          <div class="hero-heading">
-            <span class="hero-h-first">Volkan</span>
-            <span class="hero-h-last">Tuncer</span>
-          </div>
-          <div class="hero-spec">
-            <span class="hl">BÖLÜM :</span> Mekatronik Mühendisliği
-            <span class="sep">//</span>
-            <span class="hl">DİL :</span> C &nbsp;·&nbsp; Python &nbsp;·&nbsp; ASP.NET
-            <br>
-            <span class="hl">PLATFORM :</span> Linux
-            <span class="sep">//</span>
-            <span class="hl">ODAK :</span> Gömülü Sistemler &nbsp;·&nbsp; PCB &nbsp;·&nbsp; Robotik
-          </div>
-          <p class="hero-desc" data-i18n="hero_desc">
-            Devreleri anlayan, kod yazan, sistemleri birbirine bağlayan biri. Donanım ve yazılımın kesiştiği yerde çalışmak benim için hem meslek hem içgüdü.
-          </p>
-          <div class="hero-btns">
-            <a href="projeler.html" class="btn btn-primary" data-i18n="hero_btn1">Projeleri İncele</a>
-            <a href="#contact" class="btn btn-ghost" data-i18n="hero_btn2">İletişim Kur &rarr;</a>
-          </div>
-        </div>
-        <div class="hero-terminal">
-          <div class="term-bar">
-            <span class="term-title">volkan@linux: ~</span>
-            <div class="term-circles"><span class="tc-r"></span><span class="tc-y"></span><span class="tc-g"></span></div>
-          </div>
-          <div class="term-body">
-            <div class="tl"><span class="tl-prompt">volkan@kbu:~$</span>&nbsp;<span class="tl-cmd">whoami</span></div>
-            <div class="tl"><span class="tl-out">volkan_tuncer</span></div>
-            <div class="tl"><span class="tl-prompt">volkan@kbu:~$</span>&nbsp;<span class="tl-cmd">./fetch_profile.sh</span></div>
-            <div class="tl"><span class="tl-comment"># Mekatronik profili yükleniyor...</span></div>
-            <div class="tl"><span class="tl-ok">[ OK ]</span>&nbsp;<span class="tl-out">Sistem başlatıldı.</span></div>
-            <div class="tl"><span class="tl-out">NAME&nbsp;&nbsp;&nbsp;=</span>&nbsp;<span class="tl-val">"Volkan Tuncer"</span></div>
-            <div class="tl"><span class="tl-out">ROLE&nbsp;&nbsp;&nbsp;=</span>&nbsp;<span class="tl-val">"Mekatronik Mühendisi"</span></div>
-            <div class="tl"><span class="tl-out">LANGS&nbsp;&nbsp;=</span>&nbsp;<span class="tl-val">[C, Python, Bash, ASP.NET]</span></div>
-            <div class="tl"><span class="tl-out">HW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</span>&nbsp;<span class="tl-val">[Arduino, RPi, 8051, KiCad]</span></div>
-            <div class="tl"><span class="tl-out">STATUS&nbsp;=</span>&nbsp;<span class="tl-ok">Aktif</span></div>
-          </div>
-          <div class="term-divider"></div>
-          <div class="term-bars">
-            <div class="tb-title">// htop - SYSTEM LOAD (YETKİNLİKLER)</div>
-            <div class="tb-row"><div class="tb-head"><span class="tb-name">Linux / Bash</span><span class="tb-pct">52%</span></div><div class="tb-track"><div class="tb-fill c" style="width: 52% !important;"></div></div></div>
-            <div class="tb-row"><div class="tb-head"><span class="tb-name">Python</span><span class="tb-pct">60%</span></div><div class="tb-track"><div class="tb-fill c" style="width: 60% !important;"></div></div></div>
-            <div class="tb-row"><div class="tb-head"><span class="tb-name">SolidWorks</span><span class="tb-pct">75%</span></div><div class="tb-track"><div class="tb-fill g" style="width: 75% !important;"></div></div></div>
-            <div class="tb-row"><div class="tb-head"><span class="tb-name">Siemens NX</span><span class="tb-pct">70%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 70% !important;"></div></div></div>
-            <div class="tb-row"><div class="tb-head"><span class="tb-name">PCB Tasarımı</span><span class="tb-pct">45%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 75% !important;"></div></div></div>
-            <div class="tb-row"><div class="tb-head"><span class="tb-name">C</span><span class="tb-pct">45%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 65% !important;"></div></div></div>
-          </div>
-        </div>
-      </section>
+  <!-- OPEN GRAPH / SOSYAL MEDYA & GOOGLE ARAMA ÖNİZLEMESİ -->
+  <meta property="og:title" content="Volkan Tuncer — Mekatronik Mühendisi">
+  <meta property="og:image" content="https://sitenizindomani.com/vmico.webp">
+  <meta property="og:type" content="website">
 
-      <div class="s-divider"></div>
-      <section id="about" class="section">
-        <div class="section-inner">
-          <div class="about-layout">
-            <div class="about-portrait reveal">
-              <div class="portrait-frame">
-                <div class="portrait-corner tl"></div><div class="portrait-corner tr"></div>
-                <div class="portrait-corner bl"></div><div class="portrait-corner br"></div>
-                <img src="pictures/mavi.png" alt="Volkan Tuncer">
-              </div>
-              <div class="portrait-badge">KBÜ / MKT-ENG</div>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/components.js"></script>
+</head>
+<body>
+  <canvas id="space-canvas"></canvas>
+  <div class="side-stars side-stars-left" aria-hidden="true"></div>
+  <div class="side-stars side-stars-right" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+  <canvas id="cur-ripple-canvas"></canvas>
+  <div id="cur-wrap"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+
+  <!-- MASTER HEADER -->
+  <site-header></site-header>
+
+  <div class="page">
+    <section id="home">
+      <div class="hero-ruler">
+        <div class="ruler-tick big" style="margin-top:0"><span>00</span></div>
+        <div style="flex:1; width:1px; background:var(--line); margin: 6px auto;"></div>
+        <div class="ruler-tick"><span>10</span></div>
+        <div style="flex:1; width:1px; background:var(--line); margin: 6px auto;"></div>
+        <div class="ruler-tick big"><span>20</span></div>
+        <div style="flex:1; width:1px; background:var(--line); margin: 6px auto;"></div>
+        <div class="ruler-tick"><span>30</span></div>
+        <div style="flex:1; width:1px; background:var(--line); margin: 6px auto;"></div>
+        <div class="ruler-tick big"><span>40</span></div>
+      </div>
+      <div class="hero-center">
+        <div class="hero-status">
+          <span class="blink-dot"></span>
+          <span class="hero-status-text" data-i18n="hero_status">SİSTEM AKTİF &nbsp;—&nbsp; KARABÜK ÜNİVERSİTESİ</span>
+        </div>
+        <div class="hero-heading">
+          <span class="hero-h-first">Volkan</span>
+          <span class="hero-h-last">Tuncer</span>
+        </div>
+        <div class="hero-spec">
+          <span class="hl">BÖLÜM :</span> Mekatronik Mühendisliği
+          <span class="sep">//</span>
+          <span class="hl">DİL :</span> C &nbsp;·&nbsp; Python &nbsp;·&nbsp; ASP.NET
+          <br>
+          <span class="hl">PLATFORM :</span> Linux
+          <span class="sep">//</span>
+          <span class="hl">ODAK :</span> Gömülü Sistemler &nbsp;·&nbsp; PCB &nbsp;·&nbsp; Robotik
+        </div>
+        <p class="hero-desc" data-i18n="hero_desc">
+          Devreleri anlayan, kod yazan, sistemleri birbirine bağlayan biri. Donanım ve yazılımın kesiştiği yerde çalışmak benim için hem meslek hem içgüdü.
+        </p>
+        <div class="hero-btns">
+          <a href="projeler.html" class="btn btn-primary" data-i18n="hero_btn1">Projeleri İncele</a>
+          <a href="#contact" class="btn btn-ghost" data-i18n="hero_btn2">İletişim Kur &rarr;</a>
+        </div>
+      </div>
+      <div class="hero-terminal">
+        <div class="term-bar">
+          <span class="term-title">volkan@linux: ~</span>
+          <div class="term-circles"><span class="tc-r"></span><span class="tc-y"></span><span class="tc-g"></span></div>
+        </div>
+        <div class="term-body">
+          <div class="tl"><span class="tl-prompt">volkan@kbu:~$</span>&nbsp;<span class="tl-cmd">whoami</span></div>
+          <div class="tl"><span class="tl-out">volkan_tuncer</span></div>
+          <div class="tl"><span class="tl-prompt">volkan@kbu:~$</span>&nbsp;<span class="tl-cmd">./fetch_profile.sh</span></div>
+          <div class="tl"><span class="tl-comment"># Mekatronik profili yükleniyor...</span></div>
+          <div class="tl"><span class="tl-ok">[ OK ]</span>&nbsp;<span class="tl-out">Sistem başlatıldı.</span></div>
+          <div class="tl"><span class="tl-out">NAME&nbsp;&nbsp;&nbsp;=</span>&nbsp;<span class="tl-val">"Volkan Tuncer"</span></div>
+          <div class="tl"><span class="tl-out">ROLE&nbsp;&nbsp;&nbsp;=</span>&nbsp;<span class="tl-val">"Mekatronik Mühendisi"</span></div>
+          <div class="tl"><span class="tl-out">LANGS&nbsp;&nbsp;=</span>&nbsp;<span class="tl-val">[C, Python, Bash, ASP.NET]</span></div>
+          <div class="tl"><span class="tl-out">HW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</span>&nbsp;<span class="tl-val">[Arduino, RPi, 8051, KiCad]</span></div>
+          <div class="tl"><span class="tl-out">STATUS&nbsp;=</span>&nbsp;<span class="tl-ok">Aktif</span></div>
+        </div>
+        <div class="term-divider"></div>
+        <div class="term-bars">
+          <div class="tb-title">// htop - SYSTEM LOAD (YETKİNLİKLER)</div>
+          <div class="tb-row"><div class="tb-head"><span class="tb-name">Linux / Bash</span><span class="tb-pct">52%</span></div><div class="tb-track"><div class="tb-fill c" style="width: 52% !important;"></div></div></div>
+          <div class="tb-row"><div class="tb-head"><span class="tb-name">Python</span><span class="tb-pct">60%</span></div><div class="tb-track"><div class="tb-fill c" style="width: 60% !important;"></div></div></div>
+          <div class="tb-row"><div class="tb-head"><span class="tb-name">SolidWorks</span><span class="tb-pct">75%</span></div><div class="tb-track"><div class="tb-fill g" style="width: 75% !important;"></div></div></div>
+          <div class="tb-row"><div class="tb-head"><span class="tb-name">Siemens NX</span><span class="tb-pct">70%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 70% !important;"></div></div></div>
+          <div class="tb-row"><div class="tb-head"><span class="tb-name">PCB Tasarımı</span><span class="tb-pct">45%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 75% !important;"></div></div></div>
+          <div class="tb-row"><div class="tb-head"><span class="tb-name">C</span><span class="tb-pct">45%</span></div><div class="tb-track"><div class="tb-fill a" style="width: 65% !important;"></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="s-divider"></div>
+    <section id="about" class="section">
+      <div class="section-inner">
+        <div class="about-layout">
+          <div class="about-portrait reveal">
+            <div class="portrait-frame">
+              <div class="portrait-corner tl"></div><div class="portrait-corner tr"></div>
+              <div class="portrait-corner bl"></div><div class="portrait-corner br"></div>
+              <img src="pictures/mavi.webp" alt="Volkan Tuncer">
             </div>
-            <div class="about-text">
-              <div class="s-label reveal" data-i18n="about_label"><span class="s-num">01 /</span> Hakkımda</div>
-              <h2 class="s-title reveal d1" data-i18n="about_title">Nasıl <em>Biri?</em></h2>
-              <p class="reveal d2" data-i18n="about_p1">Küçüklüğümden beri bir şeylerin nasıl çalıştığına dair merakım hiç bitmedi. Mekatronik mühendisliği bu merakın doğal karşılığı — elektronik, mekanik ve yazılımın kesişiminde çalışmak bana hem mantıklı hem doğal geliyor.</p>
-              <p class="reveal d3" data-i18n="about_p2">Anadilim Türkçe, iyi İngilizce bilirim, Almancayı öğrenme aşamasındayım. Linux, SolidWorks, C ve Python odaklı çalışıyorum. PCB tasarımı (KiCad), Arduino, Raspberry Pi, gömülü C programlama ve Telegram bot geliştirme temel çalışma alanlarım.</p>
-              <div class="reveal d4">
-                <div class="tech-label">// Teknik Ekosistem</div>
-                <div class="tags">
-                  <span class="tag">C</span><span class="tag">Python</span><span class="tag">Linux / Bash</span>
-                  <span class="tag">Arduino</span><span class="tag">Raspberry Pi</span><span class="tag">KiCad PCB</span>
-                  <span class="tag">SolidWorks</span><span class="tag">Elektrik / Elektronik</span><span class="tag">Lehimleme</span>
-                  <span class="tag">ASP.NET</span><span class="tag">Telegram Bot</span><span class="tag">Git</span>
-                </div>
-              </div>
-            </div>
+            <div class="portrait-badge">KBÜ / MKT-ENG</div>
           </div>
-        </div>
-      </section>
-
-      <div class="s-divider"></div>
-      <!-- Öne Çıkan Projeler (Sadece 2 Tane) -->
-      <section class="section">
-        <div class="section-inner">
-          <div class="s-label reveal" data-i18n="proj_sec_label"><span class="s-num">02 /</span> Projeler (Özet)</div>
-          <h2 class="s-title reveal d1" data-i18n="proj_sec_title">Öne Çıkan <em>Çalışmalar</em></h2>
-          <div class="proj-grid reveal d2">
-            <a class="proj-card" href="#">
-              <div class="proj-top-line"></div>
-              <div class="proj-img-wrap"><img src="pictures/project1.png" alt="ASP.NET Alışveriş Sitesi" class="proj-img"></div>
-              <div class="proj-body">
-                <div class="proj-meta"><span class="proj-idx">PRJ-001</span><div class="proj-sep"></div><span class="proj-cat">Web · ASP.NET</span></div>
-                <div class="proj-name">Alışveriş Sitesi</div>
-                <div class="proj-cta" data-i18n="proj_cta">PDF Raporunu Gör</div>
+          <div class="about-text">
+            <div class="s-label reveal" data-i18n="about_label"><span class="s-num">01 /</span> Hakkımda</div>
+            <h2 class="s-title reveal d1" data-i18n="about_title">Nasıl <em>Biri?</em></h2>
+            <p class="reveal d2" data-i18n="about_p1">Küçüklüğümden beri bir şeylerin nasıl çalıştığına dair merakım hiç bitmedi. Mekatronik mühendisliği bu merakın doğal karşılığı — elektronik, mekanik ve yazılımın kesişiminde çalışmak bana hem mantıklı hem doğal geliyor.</p>
+            <p class="reveal d3" data-i18n="about_p2">Anadilim Türkçe, iyi İngilizce bilirim, Almancayı öğrenme aşamasındayım. Linux, SolidWorks, C ve Python odaklı çalışıyorum. PCB tasarımı (KiCad), Arduino, Raspberry Pi, gömülü C programlama ve Telegram bot geliştirme temel çalışma alanlarım.</p>
+            <div class="reveal d4">
+              <div class="tech-label">// Teknik Ekosistem</div>
+              <div class="tags">
+                <span class="tag">C</span><span class="tag">Python</span><span class="tag">Linux / Bash</span>
+                <span class="tag">Arduino</span><span class="tag">Raspberry Pi</span><span class="tag">KiCad PCB</span>
+                <span class="tag">SolidWorks</span><span class="tag">Elektrik / Elektronik</span><span class="tag">Lehimleme</span>
+                <span class="tag">ASP.NET</span><span class="tag">Telegram Bot</span><span class="tag">Git</span>
               </div>
-            </a>
-            <a class="proj-card" href="#">
-              <div class="proj-top-line"></div>
-              <div class="proj-img-wrap"><img src="pictures/project3.png" alt="PCB Tasarımı" class="proj-img"></div>
-              <div class="proj-body">
-                <div class="proj-meta"><span class="proj-idx">PRJ-003</span><div class="proj-sep"></div><span class="proj-cat">Elektronik · KiCad</span></div>
-                <div class="proj-name">Devre Tasarımı, Test &amp; PCB</div>
-                <div class="proj-cta" data-i18n="proj_cta">PDF Raporunu Gör</div>
-              </div>
-            </a>
-          </div>
-          <a href="projeler.html" class="btn btn-ghost reveal d3" data-i18n="proj_all_btn">Tüm Projeleri Gör &rarr;</a>
-        </div>
-      </section>
-
-      <div class="s-divider"></div>
-      <!-- Galeri (Sadece 3 Fotoğraf) -->
-      <section class="section">
-        <div class="section-inner">
-          <div class="s-label reveal" data-i18n="gal_sec_label"><span class="s-num">03 /</span> Galeri (Özet)</div>
-          <h2 class="s-title reveal d1" data-i18n="gal_sec_title">Anlık <em>Kareler</em></h2>
-          <div class="gal-grid reveal d2">
-            <div class="gi gi-tall"><a href="galeri.html"><img src="pictures/gallery1.jpg" alt="Galeri 1"><div class="gi-label" data-i18n="gal_all">Tümünü Gör</div></a></div>
-            <div class="gi"><a href="galeri.html"><img src="pictures/gallery2.jpg" alt="Galeri 2"></a></div>
-            <div class="gi"><a href="galeri.html"><img src="pictures/gallery3.jpg" alt="Galeri 3"></a></div>
-          </div>
-          <a href="galeri.html" class="btn btn-ghost reveal d3" data-i18n="gal_all_btn">Galerinin Tamamına Git &rarr;</a>
-        </div>
-      </section>
-
-      <div class="s-divider"></div>
-      <section id="contact" class="section">
-        <div class="section-inner">
-          <div class="s-label reveal" data-i18n="contact_label"><span class="s-num">04 /</span> İletişim</div>
-          <h2 class="s-title reveal d1" data-i18n="contact_title">Bağlantı <em>Kurun</em></h2>
-          <p class="contact-lead reveal d2" data-i18n="contact_lead">Proje fikri, teknik soru veya sadece merhaba — aşağıdaki kanallardan ulaşabilirsiniz.</p>
-          <div class="contact-grid reveal d3">
-            <div class="c-card"><div class="c-type">Telegram</div><a class="c-val" href="https://t.me/sescientist" target="_blank">@sescientist</a></div>
-            <div class="c-card"><div class="c-type">Telegram Medya Kanalı</div><a class="c-val" href="https://t.me/bilimadimlari" target="_blank">@bilimadimlari</a></div>
-            <div class="c-card"><div class="c-type">Gmail</div><a class="c-val" href="mailto:volkan.tuncer.mekatronik@gmail.com">volkan.tuncer.mekatronik@gmail.com</a></div>
-            <div class="c-card"><div class="c-type">Duck Mail</div><a class="c-val" href="mailto:volkantuncer@duck.com">volkantuncer@duck.com</a></div>
-            <div class="c-card full">
-              <div class="c-type">Telefon</div><a class="c-val" href="tel:+905057619108">+90 505 761 9108</a>
-              <div class="c-note" data-i18n="c_note">// Sesli aramaya her zaman hazır olmayabilirim</div>
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
 
-    <!-- MASTER FOOTER -->
-    <site-footer></site-footer>
+    <div class="s-divider"></div>
+    <section class="section">
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/electronic.webp" alt=""></div>
+      <div class="section-inner">
+        <div class="s-label reveal" data-i18n="proj_sec_label"><span class="s-num">02 /</span> Projeler (Özet)</div>
+        <h2 class="s-title reveal d1" data-i18n="proj_sec_title">Öne Çıkan <em>Çalışmalar</em></h2>
+        <div class="proj-grid reveal d2">
+          <a class="proj-card" href="#">
+            <div class="proj-top-line"></div>
+            <div class="proj-img-wrap"><img src="pictures/project1.webp" alt="ASP.NET Alışveriş Sitesi" class="proj-img"></div>
+            <div class="proj-body">
+              <div class="proj-meta"><span class="proj-idx">PRJ-001</span><div class="proj-sep"></div><span class="proj-cat">Web · ASP.NET</span></div>
+              <div class="proj-name">Alışveriş Sitesi</div>
+              <div class="proj-cta" data-i18n="proj_cta">PDF Raporunu Gör</div>
+            </div>
+          </a>
+          <a class="proj-card" href="#">
+            <div class="proj-top-line"></div>
+            <div class="proj-img-wrap"><img src="pictures/project3.webp" alt="PCB Tasarımı" class="proj-img"></div>
+            <div class="proj-body">
+              <div class="proj-meta"><span class="proj-idx">PRJ-003</span><div class="proj-sep"></div><span class="proj-cat">Elektronik · KiCad</span></div>
+              <div class="proj-name">Devre Tasarımı, Test &amp; PCB</div>
+              <div class="proj-cta" data-i18n="proj_cta">PDF Raporunu Gör</div>
+            </div>
+          </a>
+        </div>
+        <a href="projeler.html" class="btn btn-ghost reveal d3" data-i18n="proj_all_btn">Tüm Projeleri Gör &rarr;</a>
+      </div>
+    </section>
 
-    <script src="js/main.js"></script>
-  </body>
-  </html>
+    <div class="s-divider"></div>
+    <section class="section">
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/mechanic.webp" alt=""></div>
+      <div class="section-inner">
+        <div class="s-label reveal" data-i18n="gal_sec_label"><span class="s-num">03 /</span> Galeri (Özet)</div>
+        <h2 class="s-title reveal d1" data-i18n="gal_sec_title">Anlık <em>Kareler</em></h2>
+        <div class="gal-grid reveal d2">
+          <div class="gi gi-tall"><a href="galeri.html"><img src="pictures/gallery1.webp" alt="Galeri 1"><div class="gi-label" data-i18n="gal_all">Tümünü Gör</div></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery2.webp" alt="Galeri 2"></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery3.webp" alt="Galeri 3"></a></div>
+        </div>
+        <a href="galeri.html" class="btn btn-ghost reveal d3" data-i18n="gal_all_btn">Galerinin Tamamına Git &rarr;</a>
+      </div>
+    </section>
+
+    <div class="s-divider"></div>
+    <section id="contact" class="section">
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/world.webp" alt=""></div>
+      <div class="section-inner">
+        <div class="s-label reveal" data-i18n="contact_label"><span class="s-num">04 /</span> İletişim</div>
+        <h2 class="s-title reveal d1" data-i18n="contact_title">Bağlantı <em>Kurun</em></h2>
+        <p class="contact-lead reveal d2" data-i18n="contact_lead">Proje fikri, teknik soru veya sadece merhaba — aşağıdaki kanallardan ulaşabilirsiniz.</p>
+        <div class="contact-grid reveal d3">
+          <div class="c-card"><div class="c-type">Telegram</div><a class="c-val" href="https://t.me/sescientist" target="_blank">@sescientist</a></div>
+          <div class="c-card"><div class="c-type">Telegram Medya Kanalı</div><a class="c-val" href="https://t.me/bilimadimlari" target="_blank">@bilimadimlari</a></div>
+          <div class="c-card"><div class="c-type">Gmail</div><a class="c-val" href="mailto:volkan.tuncer.mekatronik@gmail.com">volkan.tuncer.mekatronik@gmail.com</a></div>
+          <div class="c-card"><div class="c-type">Duck Mail</div><a class="c-val" href="mailto:volkantuncer@duck.com">volkantuncer@duck.com</a></div>
+          <div class="c-card full">
+            <div class="c-type">Telefon</div><a class="c-val" href="tel:+905057619108">+90 505 761 9108</a>
+            <div class="c-note" data-i18n="c_note">// Sesli aramaya her zaman hazır olmayabilirim</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MASTER FOOTER -->
+  <site-footer></site-footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
