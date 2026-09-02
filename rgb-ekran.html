@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RGB Ekranlar Nasıl Çalışır ve 16'lık Renk İfade Sistemi — Volkan Tuncer</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/components.js"></script>
+</head>
+<body>
+  <canvas id="space-canvas"></canvas>
+  <div class="side-stars side-stars-left"></div><div class="side-stars side-stars-right"></div>
+  <div class="scroll-progress"><span></span></div>
+  <canvas id="cur-ripple-canvas"></canvas><div id="cur-wrap"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+
+  <site-header></site-header>
+
+  <div class="page" style="display:flex; flex-direction:column; min-height:100vh;">
+    <div class="page-header reveal d1">
+      <h1>RGB Ekranlar Nasıl Çalışır ve 16'lık Renk İfade Sistemi</h1>
+      <p style="font-family: var(--mono); color: var(--cyan); margin-top: 8px;">2 Eylül 2026</p>
+    </div>
+
+    <section class="section" style="flex:1;">
+      <div class="section-inner" style="padding-top: 20px; max-width: 800px; margin: 0 auto;">
+
+        <article class="blog-content reveal d2" style="font-size: 1.05rem; color: var(--fg2, #ccc); line-height: 1.8;">
+
+          <figure style="margin: 0 0 30px 0;">
+            <img src="pictures/blog_RGB_ekran.webp" alt="RGB Ekran Mikroskop Görünümü" style="width:100%; height:auto; border-radius:12px; border:1px solid var(--line2, #333); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display:block;">
+            <figcaption style="font-size: 0.85rem; color: var(--fg3, #888); margin-top: 8px; text-align: center; font-style: italic;">
+              Elektronik mikroskobumla çektiğim fotoğrafta bilgisayarımın ekranı görülüyor.
+            </figcaption>
+          </figure>
+
+          <p style="margin-bottom: 20px;">
+            <strong>RGB (Red, Green, Blue)</strong> renkli dijital cihazlarımızın ekranı aslında sadece bu üç ana rengi barındırır ve diğer renklerin hepsi bu renkler yardımıyla elde edilir. Siyah hariç tabii; siyah, tüm renklerin kapalı olmasıyla ortaya çıkar. Yani renklerin karışımıyla değil, karanlıkla elde edilir.
+          </p>
+
+          <p style="margin-bottom: 20px;">
+            Ancak siyahlığın tonunu açmak için yine RGB matrisindeki ışıklar açılır ve her üç rengin farklı yoğunluklarda yakılmasıyla çok farklı renkler elde edilebilir.
+          </p>
+
+          <p style="margin-bottom: 20px;">
+            Grafik tasarımcı arkadaşlar bu renk tonu ayarlama ekranında sağ altta sık sık şöyle bir şey görür:
+            <code style="background: rgba(255,255,255,0.08); color: var(--cyan, #00f0ff); padding: 3px 8px; border-radius: 4px; font-family: var(--mono); border: 1px solid rgba(255,255,255,0.1);">0x99CA38</code>
+          </p>
+
+          <p style="margin-bottom: 20px;">
+            <code style="color: var(--cyan, #00f0ff); font-family: var(--mono);">x</code>'ten sonraki her iki basamak bir rengin ne kadar güçlü yakılacağını anlatır. 16'lık sistem olduğu için en yüksek değer <strong style="color: var(--fg1, #fff);">99</strong> değil <strong style="color: var(--fg1, #fff);">FF</strong>'dir. <code style="color: var(--cyan, #00f0ff); font-family: var(--mono);">0x</code> ise <em>"16'lık sisteme göre oku bilgisayar/programcı efendi"</em> demektir.
+          </p>
+
+          <blockquote style="margin: 30px 0; padding: 15px 20px; border-left: 3px solid var(--cyan, #00f0ff); background: rgba(255,255,255,0.02); border-radius: 0 8px 8px 0; font-style: normal;">
+            <strong style="color: var(--fg1, #fff); display: block; margin-bottom: 5px;">Özetle:</strong>
+            Bilgisayarınızın ekranında temel olarak sadece üç ana renk vardır: <strong>Kırmızı, Yeşil ve Mavi</strong>. Diğer tüm renkler, bu üç rengin farklı yoğunluklarda bir araya getirilmesiyle oluşturulur.
+          </blockquote>
+
+        </article>
+
+      </div>
+    </section>
+
+    <site-footer></site-footer>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

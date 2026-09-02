@@ -1,4 +1,5 @@
 import os
+import re
 import datetime
 from flask import Flask, request, render_template_string, session, redirect, url_for
 from werkzeug.utils import secure_filename
@@ -11,32 +12,56 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'yedek_anahtar_123')
 
 # Görsellerin kaydedileceği ana dizin
-app.config['UPLOAD_FOLDER'] = 'pictures'
+BASE_UPLOAD_FOLDER = 'pictures'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_image_with_prefix(file_storage, prefix):
-    """Dosyayı güvenli hale getirir, prefix ekler ve pictures/ altına kaydeder."""
+def save_image_to_folder(file_storage, subfolder):
+    """
+    Dosyayı güvenli hale getirir ve belirtilen alt klasöre kaydeder.
+    Örn: pictures/blog/foto.webp, pictures/projects/kamera.png
+    """
     if not file_storage or file_storage.filename == '':
         return None
 
     if allowed_file(file_storage.filename):
         filename = secure_filename(file_storage.filename)
-        ext = filename.rsplit('.', 1)[1].lower()
-        base_name = filename.rsplit('.', 1)[0]
 
-        # Örn: blog_yazi-adi.webp, projects_kamera.png, galeri_anlik.jpg
-        new_filename = f"{prefix}{base_name}.{ext}"
+        # Target folder: pictures/blog, pictures/projects veya pictures/gallery
+        target_dir = os.path.join(BASE_UPLOAD_FOLDER, subfolder)
+        os.makedirs(target_dir, exist_ok=True)
 
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        save_path = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
+        save_path = os.path.join(target_dir, filename)
         file_storage.save(save_path)
 
-        # HTML içine yazılacak göreceli yol (pictures/ klasöründen çekecek)
-        return f"pictures/{new_filename}"
+        # HTML içinde kullanılacak bağıl yol (örn: pictures/blog/resim.jpg)
+        return f"pictures/{subfolder}/{filename}".replace("\\", "/")
     return None
+
+def format_blog_content(raw_text):
+    """Düz metni okunaklı HTML paragraflarına ve kod bloklarına dönüştürür."""
+    if not raw_text:
+        return ""
+
+    # Paragraflara böl (çift alt satıra göre)
+    paragraphs = [p.strip() for p in raw_text.split('\n\n') if p.strip()]
+    formatted_paragraphs = []
+
+    for p in paragraphs:
+        # Eğer zaten bir HTML elementi içeriyorsa dokunma
+        if p.startswith('<p>') or p.startswith('blockquote') or p.startswith('<figure>'):
+            formatted_paragraphs.append(p)
+            continue
+
+        # Hex kodları (0x99CA38 vb.) otomatik <code> içine al
+        p = re.sub(r'(0x[0-9A-Fa-f]{6})', r'<code style="background: rgba(255,255,255,0.08); color: var(--cyan, #00f0ff); padding: 3px 8px; border-radius: 4px; font-family: var(--mono); border: 1px solid rgba(255,255,255,0.1);">\1</code>', p)
+
+        formatted_paragraphs.append(f'<p style="margin-bottom: 20px;">{p}</p>')
+
+    return '\n'.join(formatted_paragraphs)
+
 
 # --- HTML ŞABLONLARI ---
 
@@ -96,12 +121,12 @@ ADMIN_HTML = """
   <!-- BLOG EKLEME -->
   <div class="box">
       <h3>> Yeni Blog Yazısı Ekle</h3>
-      <span class="note">İpucu: Yazının içine [FOTO] kelimesini eklersen, yüklediğin fotoğraf tam o noktada çıkar.</span>
+      <span class="note">İpucu: Yazının içine [FOTO] eklersen fotoğraf oraya yerleşir. Eklemeyi unutursan yazının başında çıkar.</span>
       <form action="/add_blog" method="post" enctype="multipart/form-data">
         <input type="text" name="title" placeholder="Yazı Başlığı (Örn: Gömülü Sistemler)" required>
         <input type="text" name="slug" placeholder="URL Adı (Örn: gomulu-sistemler)" required>
         <input type="text" name="summary" placeholder="Kısa Özet (Blog listesinde görünecek)" required>
-        <textarea name="content" rows="6" placeholder="İçerik... Paragraflar için <p> yazını buraya yaz </p> kullanabilirsin." required></textarea>
+        <textarea name="content" rows="8" placeholder="Metninizi paragraflar arası bir satır boşluk bırakarak yazın..." required></textarea>
         <input type="file" name="blog_img" accept="image/png, image/jpeg, image/webp">
         <button type="submit">Yazıyı Yayınla</button>
       </form>
@@ -137,6 +162,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title} — Volkan Tuncer</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/components.js"></script>
@@ -146,21 +172,26 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <div class="side-stars side-stars-left"></div><div class="side-stars side-stars-right"></div>
   <div class="scroll-progress"><span></span></div>
   <canvas id="cur-ripple-canvas"></canvas><div id="cur-wrap"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+
   <site-header></site-header>
+
   <div class="page" style="display:flex; flex-direction:column; min-height:100vh;">
     <div class="page-header reveal d1">
       <h1>{title}</h1>
-      <p style="font-family: var(--mono); color: var(--cyan);">{date}</p>
+      <p style="font-family: var(--mono); color: var(--cyan); margin-top: 8px;">{date}</p>
     </div>
+
     <section class="section" style="flex:1;">
-      <div class="section-inner" style="padding-top: 40px;">
-        <div class="reveal d2" style="font-size: 1.1rem; color: var(--fg2); line-height: 1.9;">
+      <div class="section-inner" style="padding-top: 20px; max-width: 800px; margin: 0 auto;">
+        <article class="blog-content reveal d2" style="font-size: 1.05rem; color: var(--fg2, #ccc); line-height: 1.8;">
           {content}
-        </div>
+        </article>
       </div>
     </section>
+
     <site-footer></site-footer>
   </div>
+
   <script src="js/main.js"></script>
 </body>
 </html>
@@ -173,7 +204,7 @@ def is_logged_in():
 
 def get_turkish_date():
     now = datetime.datetime.now()
-    aylar = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+    aylar = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylul", "Ekim", "Kasım", "Aralık"]
     return f"{now.day} {aylar[now.month]} {now.year}"
 
 def inject_html(filename, marker, injection_code):
@@ -219,23 +250,29 @@ def add_blog():
     title = request.form['title']
     slug = secure_filename(request.form['slug']) + '.html'
     summary = request.form['summary']
-    content = request.form['content']
+    raw_content = request.form['content']
     date_str = get_turkish_date()
 
-    # Fotoğraf İşleme (blog_ prefix ile pictures/ altına kaydedilir)
+    # Fotoğraf İşleme -> pictures/blog/ altına kaydeder
     img_html = ""
     if 'blog_img' in request.files:
-        file_path = save_image_with_prefix(request.files['blog_img'], 'blog_')
+        file_path = save_image_to_folder(request.files['blog_img'], 'blog')
         if file_path:
-            img_html = f'<img src="{file_path}" style="max-width:100%; border-radius:8px; margin:25px 0; border:1px solid var(--line2); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">'
+            img_html = f'''
+          <figure style="margin: 0 0 30px 0;">
+            <img src="{file_path}" alt="{title}" style="width:100%; height:auto; border-radius:12px; border:1px solid var(--line2, #333); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display:block;">
+          </figure>'''
 
-    if '[FOTO]' in content:
-        content = content.replace('[FOTO]', img_html)
+    # İçeriği tipografik HTML formatına çevir
+    formatted_body = format_blog_content(raw_content)
+
+    if '[FOTO]' in formatted_body:
+        final_content = formatted_body.replace('[FOTO]', img_html)
     else:
-        content = img_html + content
+        final_content = img_html + "\n" + formatted_body
 
     # Sayfayı Üret
-    full_html = PAGE_TEMPLATE.format(title=title, date=date_str, content=content)
+    full_html = PAGE_TEMPLATE.format(title=title, date=date_str, content=final_content)
     with open(slug, 'w', encoding='utf-8') as f:
         f.write(full_html)
 
@@ -248,7 +285,7 @@ def add_blog():
           </a>"""
     inject_html('blog.html', '<div class="blog-grid reveal d2">', card)
 
-    return redirect(url_for('index', msg=f'Blog oluşturuldu: {slug}'))
+    return redirect(url_for('index', msg=f'Blog başarıyla oluşturuldu: {slug}'))
 
 @app.route('/add_project', methods=['POST'])
 def add_project():
@@ -259,8 +296,8 @@ def add_project():
     idx = request.form['idx']
     link = request.form['link']
 
-    # Proje resmi (projects_ prefix ile pictures/ altına kaydedilir)
-    file_path = save_image_with_prefix(request.files['proj_img'], 'projects_')
+    # Proje resmi -> pictures/projects/ altına kaydeder
+    file_path = save_image_to_folder(request.files['proj_img'], 'projects')
     if not file_path:
         return redirect(url_for('index', msg='Hata: Proje fotoğrafı yüklenemedi!'))
 
@@ -284,8 +321,8 @@ def add_gallery():
 
     label = request.form['label']
 
-    # Galeri resmi (galeri_ prefix ile pictures/ altına kaydedilir)
-    file_path = save_image_with_prefix(request.files['gal_img'], 'galeri_')
+    # Galeri resmi -> pictures/gallery/ altına kaydeder
+    file_path = save_image_to_folder(request.files['gal_img'], 'gallery')
     if not file_path:
         return redirect(url_for('index', msg='Hata: Galeri fotoğrafı yüklenemedi!'))
 

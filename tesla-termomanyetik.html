@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Isıdan Harekete: Nikola Tesla ve Termo-Manyetik Motorun Büyüleyici Hikayesi — Volkan Tuncer</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/components.js"></script>
+  <style>
+    /* Blog içi özel stil dokunuşları (Var olan tema değişkenlerinle tam uyumlu) */
+    .quote-box {
+      margin: 25px 0 35px 0;
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 4px solid var(--cyan, #00f2fe);
+      border-radius: 0 12px 12px 0;
+      font-style: italic;
+      position: relative;
+    }
+    .quote-box p {
+      margin: 0 0 10px 0 !important;
+      color: var(--fg, #fff);
+      font-size: 1.08rem;
+      line-height: 1.7;
+    }
+    .quote-box cite {
+      display: block;
+      font-style: normal;
+      font-family: var(--mono, monospace);
+      font-size: 0.9rem;
+      color: var(--cyan, #00f2fe);
+      text-align: right;
+    }
+    .blog-content h2 {
+      color: var(--fg, #fff);
+      font-size: 1.5rem;
+      margin: 40px 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .blog-content p {
+      margin-bottom: 20px;
+    }
+    .blog-steps {
+      margin: 20px 0 30px 0;
+      padding-left: 20px;
+    }
+    .blog-steps li {
+      margin-bottom: 16px;
+      padding-left: 8px;
+    }
+    .blog-steps strong {
+      color: var(--cyan, #00f2fe);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="space-canvas"></canvas>
+  <div class="side-stars side-stars-left"></div><div class="side-stars side-stars-right"></div>
+  <div class="scroll-progress"><span></span></div>
+  <canvas id="cur-ripple-canvas"></canvas><div id="cur-wrap"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+
+  <site-header></site-header>
+
+  <div class="page" style="display:flex; flex-direction:column; min-height:100vh;">
+    <div class="page-header reveal d1">
+      <h1>Isıdan Harekete: Nikola Tesla ve Termo-Manyetik Motorun Büyüleyici Hikayesi</h1>
+      <p style="font-family: var(--mono); color: var(--cyan); margin-top: 8px;">2 Eylül 2026</p>
+    </div>
+
+    <section class="section" style="flex:1;">
+      <div class="section-inner" style="padding-top: 20px; max-width: 800px; margin: 0 auto;">
+        <article class="blog-content reveal d2" style="font-size: 1.05rem; color: var(--fg2, #ccc); line-height: 1.8;">
+
+          <figure style="margin: 0 0 30px 0;">
+            <img src="pictures/blog/tesla-termomanyetik.webp" alt="Isıdan Harekete: Nikola Tesla ve Termo-Manyetik Motorun Büyüleyici Hikayesi" style="width:100%; height:auto; border-radius:12px; border:1px solid var(--line2, #333); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display:block;">
+            <figcaption style="font-size: 0.85rem; color: #888; margin-top: 8px; text-align: center; font-family: var(--mono);">Nikola Tesla'nın Termo-Manyetik Motor Tasarımı ve Curie Sıcaklığı Döngüsü</figcaption>
+          </figure>
+
+          <!-- Tesla Alıntı Kutusu -->
+          <blockquote class="quote-box">
+            <p>“Yıkmak için inşa ediyoruz. Çalışmalarımızla kaynaklarımızın çoğu insafsızca heba ediliyor. İlerleyişimizi tahribatla damgalıyoruz. Gözümüzün gördüğü her yerde zaman, emek ve yaşam kaybı var. Sevimsiz bir manzara; ama gerçek bu.”</p>
+            <cite>— Nikola Tesla</cite>
+          </blockquote>
+
+          <p>Bilim ve teknoloji tarihine baktığımızda, bazı buluşların çağının ötesinde kalıp hak ettiği değeri göremediğini fark ederiz. İşte bu buluşlardan biri de <strong>Nikola Tesla’nın Termo-Manyetik Motoru</strong>.</p>
+
+          <p>Bugün gelin, hem fizik kurallarını altüst eden bu dahiyane mekanizmaya hem de arkasındaki hüzünlü ve ilham verici hayat hikayesine yakından bakalım.</p>
+
+          <h2>Termo-Manyetik Motor Nasıl Çalışır? (Curie Sıcaklığı Etkisi)</h2>
+
+          <p>Bu motorun temelinde, Marie Curie'nin eşi ünlü fizikçi <strong>Pierre Curie</strong> tarafından keşfedilen <em>"Curie Sıcaklığı"</em> prensibi yatar. Sistem, ısı enerjisini mekanik enerjiye dönüştürmenin son derece yaratıcı ve alternatif bir yolunu sunar.</p>
+
+          <p>Süreç oldukça basit ama bir o kadar da büyüleyicidir:</p>
+
+          <ol class="blog-steps">
+            <li>
+              <strong>Çekim ve Konumlanma:</strong> Ferromanyetik (mıknatıs tarafından çekilebilen) bir metal parçası, yakındaki bir mıknatısın çekim gücüyle ona doğru yaklaşır. Metal tam bu konumdayken altında bir ısı kaynağı (ateş/alev) bulunur.
+            </li>
+            <li>
+              <strong>Manyetik Özelliğin Kaybı:</strong> Ateşin etkisiyle ısınan metal, kritik sıcaklığı (Curie Noktası) geçtiği an ferromanyetik özelliğini aniden kaybeder. Mıknatıs artık onu çekemediği için metal konum değiştirerek ateşten uzaklaşır.
+            </li>
+            <li>
+              <strong>Soğuma ve Döngü:</strong> Isı kaynağından uzaklaşan metal hızla soğur. Soğudukça kaybettiği manyetik özelliği tekrar kazanır ve mıknatıs tarafından yeniden çekilerek ilk konumuna döner.
+            </li>
+          </ol>
+
+          <p>Bu döngü sürekli tekrar ederek ısı enerjisinden kesintisiz bir mekanik hareket üretir.</p>
+
+          <h2>Bir Dehanın Kapitalizmle İmtihanı</h2>
+
+          <p>Tesla sadece elektrik akımlarıyla değil, enerjinin her formuyla dönüştürücü projeler geliştiren bir vizyonerdi. Ancak ne yazık ki büyük mucit Nikola Tesla, finansal yeteneklerinin zayıflığı ve iş dünyasındaki acımasız kapitalist sistem nedeniyle hak ettiği değeri yaşarken göremedi.</p>
+
+          <p>Defalarca kandırıldı, patenti elinden alındı ve hayatının son dönemlerini büyük bir sefalet içinde geçirdi. Ancak tüm bu zorluklara ve haksızlıklara rağmen, kişisel kazancı değil insanlığın geleceğini hedefleyerek dev buluşlar yapmaktan hiçbir zaman vazgeçmedi.</p>
+
+        </article>
+      </div>
+    </section>
+
+    <site-footer></site-footer>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
