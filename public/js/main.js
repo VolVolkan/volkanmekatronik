@@ -1,4 +1,42 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+
+
+  // Header ve mobil menüdeki anchor (#) linkleri için performanslı JS scroll
+  document.querySelectorAll('a[href*="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href) return;
+
+      // Linki sayfa kısmı ve ID kısmı olarak böl (örn: "index.html" ve "about")
+      const [pagePath, targetId] = href.split('#');
+
+      // Geçerli sayfada mıyız kontrol et (href="#about" veya href="index.html#about")
+      const isSamePage = !pagePath ||
+      window.location.pathname.endsWith(pagePath) ||
+      (pagePath === 'index.html' && (window.location.pathname === '/' || window.location.pathname === ''));
+
+      if (isSamePage && targetId) {
+        const targetElement = document.getElementById(targetId);
+
+        // Hedef element sayfada varsa müdahale et
+        if (targetElement) {
+          e.preventDefault(); // Varsayılan CSS/HTML zıplamasını engelle
+
+          // Terminaldeki aynı performanslı scroll fonksiyonu
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+
+          // Mobil menü açıksa tıkladıktan sonra otomatik kapat
+          const hamburger = document.getElementById('hamburger');
+          const mobileMenu = document.getElementById('mobile-menu');
+          if (hamburger && hamburger.classList.contains('open')) {
+            hamburger.classList.remove('open');
+            mobileMenu.classList.remove('open');
+          }
+        }
+      }
+    });
+  });
   /* ══════════════════════════════════
    *    1. REVEAL ANIMASYONLARI
    * ══════════════════════════════════ */
@@ -12,6 +50,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.1 });
 
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* ══════════════════════════════════
+   *    1b. FOOTER ANİMASYONLARI SADECE GÖRÜNÜRKEN ÇALIŞSIN
+   *    (PCB paket animasyonları sayfanın en altında ama görünmese
+   *    bile sürekli GPU'yu meşgul ediyordu)
+   * ══════════════════════════════════ */
+  const footerEl = document.querySelector('footer');
+  if (footerEl) {
+    const footerIO = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        footerEl.style.setProperty('--footer-anim-state', entry.isIntersecting ? 'running' : 'paused');
+        footerEl.classList.toggle('footer-in-view', entry.isIntersecting);
+      });
+    }, { threshold: 0 });
+    footerIO.observe(footerEl);
+  }
 
   /* ══════════════════════════════════
    *    2. ÖZEL İMLEÇ & YILDIZ TOZU (STARDUST)
@@ -104,12 +158,16 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     // Event Delegation ile performanslı hover yönetimi
+    // PERF: nav (header) hariç tutuluyor — navigasyon elemanlarının
+    // hiçbirinde artık hiçbir JS tetiklemesi/durum değişikliği yok.
     const hoverSelectors = 'a, button, .proj-card, .c-card, .gi, .tag, .btn, .theme-toggle';
     document.body.addEventListener('mouseover', e => {
+      if (e.target.closest('nav')) return;
       if (e.target.closest(hoverSelectors)) wrap.classList.add('hov');
     }, { passive: true });
 
       document.body.addEventListener('mouseout', e => {
+        if (e.target.closest('nav')) return;
         if (e.target.closest(hoverSelectors)) wrap.classList.remove('hov');
       }, { passive: true });
 
@@ -135,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let scrollYPos = window.scrollY;
     window.addEventListener('scroll', () => { scrollYPos = window.scrollY; }, { passive: true });
 
-    const starCount = 130;
+    const starCount = 80; // Performans: iGPU'larda fill-rate maliyetini azaltmak için düşürüldü
     const stars = Array.from({ length: starCount }, () => ({
       x: Math.random() * w,
                                                            y: Math.random() * h,
@@ -361,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 5. ÇEVİRİ SÖZLÜĞÜ (i18n)
- ═ *══*═══════════════════════════════════════ */
+ ═ **══*═══════════════════════════════════════ */
 const dict = {
   tr: {
     nav_chip: "MKT · ENG",
@@ -499,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 6. TERMINAL & ARCADE MOTORU
- ═ *══*═══════════════════════════════════════ */
+ ═ **══*═══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   const termBody = document.querySelector('.hero-terminal .term-body');
   if (!termBody) return;
@@ -684,94 +742,4 @@ document.addEventListener('DOMContentLoaded', () => {
         dotContainer.remove();
       }, 6200);
     }
-});
-
-/* ══════════════════════════════════════════
- * 7. HEADER MECHA-BOT (SITELER ARASI OPTİMİZE)
- ═ *══*═══════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-  const nav = document.querySelector('nav');
-  if (!nav) return;
-
-  document.querySelectorAll('.draggable-robot').forEach(el => el.remove());
-
-  const robot = document.createElement('div');
-  robot.className = 'draggable-robot';
-  robot.style.cssText = 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:300;cursor:grab;display:flex;flex-direction:column;align-items:center;user-select:none;';
-  robot.innerHTML = `
-  <div style="width: 12px; height: 2px; background: var(--amber); margin-bottom: 2px; box-shadow: 0 0 6px var(--amber);"></div>
-  <div style="width: 38px; height: 26px; background: var(--surface); border: 1px solid var(--cyan); border-radius: 6px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px color-mix(in srgb, var(--cyan) 40%, transparent);">
-  <div style="display: flex; gap: 6px;">
-  <span class="r-eye" style="width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 8px var(--cyan);"></span>
-  <span class="r-eye" style="width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 8px var(--cyan);"></span>
-  </div>
-  </div>
-  <div style="font-family: var(--mono); font-size: 0.45rem; color: var(--fg3); margin-top: 2px; letter-spacing: 0.1em;">MECHA-BOT</div>
-  `;
-
-  nav.appendChild(robot);
-
-  let eyeCenters = [];
-  function updateEyeCenters() {
-    const eyes = robot.querySelectorAll('.r-eye');
-    eyeCenters = Array.from(eyes).map(eye => {
-      const rect = eye.getBoundingClientRect();
-      return { el: eye, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-    });
-  }
-
-  setTimeout(updateEyeCenters, 200);
-  window.addEventListener('resize', updateEyeCenters, { passive: true });
-  window.addEventListener('scroll', updateEyeCenters, { passive: true });
-
-  let isDragging = false;
-  let startX, startY, initialX, initialY;
-
-  robot.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    robot.style.cursor = 'grabbing';
-    robot.style.transition = 'none';
-
-    startX = e.clientX;
-    startY = e.clientY;
-
-    const rect = robot.getBoundingClientRect();
-    const navRect = nav.getBoundingClientRect();
-
-    initialX = rect.left - navRect.left;
-    initialY = rect.top - navRect.top;
-
-    e.preventDefault();
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      robot.style.left = (initialX + dx) + 'px';
-      robot.style.top = (initialY + dy) + 'px';
-      robot.style.transform = 'none';
-      return;
-    }
-
-    // Göz takibi optimizasyonu
-    if (!eyeCenters.length) return;
-    for (let i = 0; i < eyeCenters.length; i++) {
-      const eye = eyeCenters[i];
-      const angle = Math.atan2(e.clientY - eye.y, e.clientX - eye.x);
-      const moveX = Math.cos(angle) * 2;
-      const moveY = Math.sin(angle) * 2;
-      eye.el.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
-    }
-  }, { passive: true });
-
-  document.addEventListener('mouseup', () => {
-    if (isDragging) {
-      isDragging = false;
-      robot.style.cursor = 'grab';
-      robot.style.transition = 'transform 0.3s ease';
-      robot.style.transform = 'scale(1.1)';
-      setTimeout(() => { robot.style.transform = 'none'; updateEyeCenters(); }, 200);
-    }
-  });
 });
