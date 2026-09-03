@@ -419,7 +419,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 5. ÇEVİRİ SÖZLÜĞÜ (i18n)
- ═ **══*═══════════════════════════════════════ */
+ *    index.html'deki güncel TR içeriğinden üretildi (05.09.2026 güncellemesi).
+ ═ ***══*═══════════════════════════════════════ */
 const dict = {
   tr: {
     nav_chip: "MKT · ENG",
@@ -429,23 +430,26 @@ const dict = {
     nav_gallery: "Galeri",
     nav_blog: "Blog",
     nav_contact: "İletişim",
-    hero_status: "Hoşgeldiniz &nbsp;—&nbsp; KARABÜK ÜNİVERSİTESİ",
-    hero_desc: "Teknolojinin yalnızca nasıl çalıştığını değil, nasıl bir sisteme dönüştürülebileceğini anlamaya odaklanıyorum. Devrelerden yazılıma, otomasyondan sistem entegrasyonuna kadar farklı disiplinleri bir araya getirerek teknik çözümleri yönetilebilir ve sürdürülebilir yapılara dönüştürüyorum. Benim için mühendislik, yalnızca üretmek değil; doğru teknolojiyi seçmek, doğru insan ve kaynakları bir araya getirmek ve ortaya ölçülebilir bir sonuç çıkarmaktır.",
+    hero_status: "Hoşgeldiniz &nbsp;—&nbsp; MEKATRONİK MÜHENDİSİ",
+    hero_desc: "Teknolojinin yalnızca nasıl çalıştığını değil, nasıl bir sisteme dönüştürülebileceğini anlamaya odaklanıyorum. Devrelerden yazılıma, otomasyondan sistem entegrasyonuna kadar farklı disiplinleri bir araya getirerek teknik çözümleri yönetilebilir ve sürdürülebilir yapılara dönüştürüyorum. Eskişehir merkezli yürütmeyi hedeflediğim mühendislik vizyonumla; doğru teknolojiyi seçmek, doğru kaynakları bir araya getirmek ve ölçülebilir sonuçlar üretmek üzerine çalışıyorum.",
     hero_btn1: "Projeleri İncele",
     hero_btn2: "İletişim Kur &rarr;",
     about_label: "01 / Hakkımda",
     about_title: "Nasıl <em>Biri?</em>",
-    about_p1: "Küçüklüğümden beri bir şeylerin nasıl çalıştığına dair merakım hiç bitmedi. Mekatronik mühendisliği bu merakın doğal karşılığı — elektronik, mekanik ve yazılımın kesişiminde çalışmak bana hem mantıklı hem doğal geliyor.",
-    about_p2: "Multidisipliner bir yaklaşımla; gömülü sistemler, donanım tasarımı ve yazılım geliştirme alanlarını uçtan uca entegre eden sistem odaklı bir mühendisim.<ul class='about-highlights'><li><strong>Yazılım &amp; Sistemler:</strong> C ve Python odaklı mimariler, ileri seviye Linux ekosistemi ve Selenium otomasyonları.</li><li><strong>Gömülü &amp; Tasarım:</strong> KiCad ile PCB tasarımı, SolidWorks ile mekanik modelleme, gömülü C programlama, Arduino ve Raspberry Pi mimarileri.</li><li><strong>Sistem Entegrasyonu:</strong> Münferit teknolojileri tek başına kullanmak yerine; donanım, gömülü yazılım ve otomasyon katmanlarını ihtiyaca uygun şekilde bir araya getirerek uçtan uca çalışan çözümler üretme yaklaşımı.</li><li><strong>Dil Yeterlilikleri:</strong> Türkçe (Ana Dil), İngilizce (B2 / İş Düzeyi), Almanca (Öğrenim Aşamasında).</li></ul>",
+    about_p1: "Küçüklüğümden beri bir şeylerin nasıl çalıştığına dair merakım hiç bitmedi. Bir sistemi oluşturan parçaların nasıl bir araya geldiğini anlamak ve onları birlikte çalışırken görmek her zaman ilgimi çekti. Mekatronik mühendisliği de bu merakın doğal karşılığı oldu — elektronik, mekanik ve yazılımın kesişiminde çalışmak bana hem mantıklı hem de doğal geliyor. Zamanla bu merak, yalnızca sistemleri anlamaktan çok, onları bir bütün olarak düşünmeye ve ortaya çıkan sonucu yönetmeye dönüştü.",
+    about_p2: "<p>Multidisipliner bir yaklaşımla; gömülü sistemler, donanım tasarımı ve yazılım geliştirme alanlarını uçtan uca entegre eden sistem odaklı bir mühendisim.</p><ul class='about-highlights'><li><strong>Yazılım &amp; Sistemler:</strong> C ve Python odaklı mimariler, ileri seviye Linux ekosistemi ve Selenium otomasyonları.</li><li><strong>Gömülü &amp; Tasarım:</strong> KiCad ile PCB tasarımı, SolidWorks ile mekanik modelleme, gömülü C programlama, Arduino ve Raspberry Pi mimarileri.</li><li><strong>Sistem Entegrasyonu:</strong> Münferit teknolojileri tek başına kullanmak yerine; donanım, gömülü yazılım ve otomasyon katmanlarını ihtiyaca uygun şekilde bir araya getirerek uçtan uca çalışan çözümler üretme yaklaşımı.</li><li><strong>Dil Yeterlilikleri:</strong> Türkçe (Ana Dil), İngilizce (Aktif / İş Düzeyi), Almanca (Öğrenim Aşamasında).</li></ul>",
     proj_sec_label: "02 / Projeler (Özet)",
     proj_sec_title: "Öne Çıkan <em>Çalışmalar</em>",
+    proj_cta: "PDF Raporunu Gör",
     proj_all_btn: "Tüm Projeleri Gör &rarr;",
     gal_sec_label: "03 / Galeri (Özet)",
     gal_sec_title: "Anlık <em>Kareler</em>",
+    gal_all: "Tümünü Gör",
     gal_all_btn: "Galerinin Tamamına Git &rarr;",
-    contact_label: "04 / İletişim",
+    contact_label: "05 / İletişim",
     contact_title: "Bağlantı <em>Kurun</em>",
-    contact_lead: "Proje fikri, teknik soru veya sadece merhaba — aşağıdaki kanallardan ulaşabilirsiniz.",
+    contact_lead: "Eskişehir veya Türkiye genelinde mühendislik projeleri, teknik sorular veya iş birlikleri için aşağıdaki kanallardan ulaşabilirsiniz.",
+    c_note: "// Sesli aramaya her zaman hazır olmayabilirim",
     footer_copy: "© 2026 Volkan Tuncer — Karabük Üniversitesi · Mekatronik Mühendisliği",
     footer_sys: "sistem aktif"
   },
@@ -457,23 +461,26 @@ const dict = {
     nav_gallery: "Gallery",
     nav_blog: "Blog",
     nav_contact: "Contact",
-    hero_status: "SYSTEM ACTIVE &nbsp;—&nbsp; KARABUK UNIVERSITY",
-    hero_desc: "Understanding circuits, writing code, connecting systems. Working at the intersection of hardware and software is both a profession and an instinct for me.",
+    hero_status: "Welcome &nbsp;—&nbsp; MECHATRONICS ENGINEER",
+    hero_desc: "I focus on understanding not just how technology works, but how it can be turned into a complete system. By bringing together disciplines from circuits to software, from automation to system integration, I turn technical solutions into manageable, sustainable structures. With an engineering vision centered in Eskişehir, I work on choosing the right technology, bringing together the right resources, and producing measurable results.",
     hero_btn1: "View Projects",
     hero_btn2: "Get in Touch &rarr;",
-    about_label: "01 / About",
+    about_label: "01 / About Me",
     about_title: "Who am <em>I?</em>",
-    about_p1: "Ever since I was a kid, my curiosity about how things work has never stopped. Mechatronics engineering is the natural answer to this curiosity — working at the intersection of electronics, mechanics, and software feels both logical and natural to me.",
-    about_p2: "My native language is Turkish, I speak good English, and I am learning German. I focus on Linux, SolidWorks, C, and Python. PCB design (KiCad), Arduino, Raspberry Pi, embedded C programming, and Telegram bot development are my core fields.",
+    about_p1: "My curiosity about how things work has never faded since childhood. Understanding how the parts that make up a system come together, and seeing them work in harmony, has always fascinated me. Mechatronics engineering became the natural answer to that curiosity — working at the intersection of electronics, mechanics, and software feels both logical and natural to me. Over time, this curiosity evolved from simply understanding systems into thinking of them as a whole and managing the outcome.",
+    about_p2: "<p>With a multidisciplinary approach, I am a systems-focused engineer who integrates embedded systems, hardware design, and software development end to end.</p><ul class='about-highlights'><li><strong>Software &amp; Systems:</strong> C and Python-focused architectures, an advanced Linux ecosystem, and Selenium automation.</li><li><strong>Embedded &amp; Design:</strong> PCB design with KiCad, mechanical modeling with SolidWorks, embedded C programming, and Arduino / Raspberry Pi architectures.</li><li><strong>System Integration:</strong> Rather than using individual technologies in isolation, an approach that brings together hardware, embedded software, and automation layers as needed to produce end-to-end working solutions.</li><li><strong>Language Skills:</strong> Turkish (Native), English (Active / Working Proficiency), German (Currently Learning).</li></ul>",
     proj_sec_label: "02 / Projects (Summary)",
     proj_sec_title: "Featured <em>Works</em>",
+    proj_cta: "View PDF Report",
     proj_all_btn: "View All Projects &rarr;",
     gal_sec_label: "03 / Gallery (Summary)",
     gal_sec_title: "Instant <em>Frames</em>",
+    gal_all: "View All",
     gal_all_btn: "Go to Full Gallery &rarr;",
-    contact_label: "04 / Contact",
+    contact_label: "05 / Contact",
     contact_title: "Establish <em>Connection</em>",
-    contact_lead: "Project ideas, technical questions, or just a hello — you can reach out via the channels below.",
+    contact_lead: "You can reach me through the channels below for engineering projects, technical questions, or collaborations across Eskişehir or Turkey.",
+    c_note: "// I may not always be available for voice calls",
     footer_copy: "© 2026 Volkan Tuncer — Karabuk University · Mechatronics Engineering",
     footer_sys: "system active"
   },
@@ -485,23 +492,26 @@ const dict = {
     nav_gallery: "Galerie",
     nav_blog: "Blog",
     nav_contact: "Kontakt",
-    hero_status: "SYSTEM AKTIV &nbsp;—&nbsp; UNIVERSITÄT KARABÜK",
-    hero_desc: "Schaltungen verstehen, Code schreiben, Systeme verbinden. An der Schnittstelle von Hardware und Software zu arbeiten ist für mich Beruf und Instinkt zugleich.",
+    hero_status: "Willkommen &nbsp;—&nbsp; MECHATRONIK-INGENIEUR",
+    hero_desc: "Ich konzentriere mich darauf, nicht nur zu verstehen, wie Technologie funktioniert, sondern wie sie in ein vollständiges System verwandelt werden kann. Indem ich Disziplinen von Schaltkreisen bis Software, von Automatisierung bis Systemintegration zusammenbringe, verwandle ich technische Lösungen in handhabbare und nachhaltige Strukturen. Mit einer ingenieurtechnischen Vision mit Schwerpunkt Eskişehir arbeite ich daran, die richtige Technologie auszuwählen, die richtigen Ressourcen zusammenzubringen und messbare Ergebnisse zu erzielen.",
     hero_btn1: "Projekte Ansehen",
     hero_btn2: "Kontakt Aufnehmen &rarr;",
     about_label: "01 / Über mich",
     about_title: "Wer bin <em>ich?</em>",
-    about_p1: "Schon als Kind war meine Neugier, wie Dinge funktionieren, ungestillt. Mechatronik-Ingenieurwesen ist die natürliche Antwort darauf — an der Schnittstelle von Elektronik, Mechanik und Software zu arbeiten fühlt sich logisch und natürlich an.",
-    about_p2: "Meine Muttersprache ist Türkisch, ich spreche gut Englisch und lerne Deutsch. Ich arbeite schwerpunktmäßig mit Linux, SolidWorks, C und Python. PCB-Design (KiCad), Arduino, Raspberry Pi, Embedded C und Telegram-Bot-Entwicklung sind meine Kernbereiche.",
+    about_p1: "Meine Neugier, wie Dinge funktionieren, ist seit meiner Kindheit nie erloschen. Zu verstehen, wie die Teile eines Systems zusammenkommen, und zu sehen, wie sie gemeinsam funktionieren, hat mich immer fasziniert. Mechatronik-Ingenieurwesen wurde die natürliche Antwort auf diese Neugier — an der Schnittstelle von Elektronik, Mechanik und Software zu arbeiten fühlt sich für mich logisch und natürlich an. Mit der Zeit entwickelte sich diese Neugier vom bloßen Verstehen von Systemen zu einem ganzheitlichen Denken und der Steuerung des Ergebnisses.",
+    about_p2: "<p>Mit einem multidisziplinären Ansatz bin ich ein systemorientierter Ingenieur, der eingebettete Systeme, Hardwaredesign und Softwareentwicklung durchgängig integriert.</p><ul class='about-highlights'><li><strong>Software &amp; Systeme:</strong> C- und Python-orientierte Architekturen, ein fortgeschrittenes Linux-Ökosystem und Selenium-Automatisierungen.</li><li><strong>Embedded &amp; Design:</strong> PCB-Design mit KiCad, mechanische Modellierung mit SolidWorks, eingebettete C-Programmierung sowie Arduino- und Raspberry-Pi-Architekturen.</li><li><strong>Systemintegration:</strong> Statt einzelne Technologien isoliert einzusetzen, ein Ansatz, der Hardware-, Embedded-Software- und Automatisierungsebenen bedarfsgerecht zusammenführt, um durchgängig funktionierende Lösungen zu schaffen.</li><li><strong>Sprachkenntnisse:</strong> Türkisch (Muttersprache), Englisch (Aktiv / Berufliches Niveau), Deutsch (In Ausbildung).</li></ul>",
     proj_sec_label: "02 / Projekte (Zusammenfassung)",
     proj_sec_title: "Ausgewählte <em>Arbeiten</em>",
+    proj_cta: "PDF-Bericht Ansehen",
     proj_all_btn: "Alle Projekte Ansehen &rarr;",
     gal_sec_label: "03 / Galerie (Zusammenfassung)",
-    gal_sec_title: "Schnappschüsse",
+    gal_sec_title: "Momentaufnahmen",
+    gal_all: "Alle Ansehen",
     gal_all_btn: "Zur Vollständigen Galerie &rarr;",
-    contact_label: "04 / Kontakt",
+    contact_label: "05 / Kontakt",
     contact_title: "Verbindung <em>Herstellen</em>",
-    contact_lead: "Projektideen, technische Fragen oder einfach Hallo — Sie erreichen mich über die folgenden Kanäle.",
+    contact_lead: "Für Ingenieurprojekte, technische Fragen oder Kooperationen in Eskişehir oder in ganz Türkei erreichen Sie mich über die folgenden Kanäle.",
+    c_note: "// Für Telefonanrufe bin ich möglicherweise nicht immer erreichbar",
     footer_copy: "© 2026 Volkan Tuncer — Universität Karabuk · Mechatronik",
     footer_sys: "system aktiv"
   },
@@ -513,23 +523,26 @@ const dict = {
     nav_gallery: "画廊",
     nav_blog: "博客",
     nav_contact: "联系",
-    hero_status: "系统运行中 &nbsp;—&nbsp; 卡拉比克大学",
-    hero_desc: "理解电路，编写代码，连接系统。在硬件和软件的交汇处工作对我而言既是职业也是本能。",
+    hero_status: "欢迎 &nbsp;—&nbsp; 机电工程师",
+    hero_desc: "我关注的不仅是技术如何运作，更是它如何转化为一个完整的系统。通过将电路、软件、自动化和系统集成等不同学科结合起来，我将技术方案转化为可管理、可持续的结构。以埃斯基谢希尔为中心的工程愿景为基础，我致力于选择合适的技术、整合合适的资源，并产出可衡量的成果。",
     hero_btn1: "查看项目",
     hero_btn2: "取得联系 &rarr;",
     about_label: "01 / 关于我",
     about_title: "我是 <em>谁？</em>",
-    about_p1: "从小到大，我对事物运作原理的好奇心从未停止。机电工程正是这种好奇心的自然解答——在电子、机械和软件的交汇处工作对我来说既合乎逻辑又自然。",
-    about_p2: "我的母语是土耳其语，英语流利，目前正在学习德语。我专注于 Linux、SolidWorks、C 和 Python。PCB设计 (KiCad)、Arduino、Raspberry Pi、嵌入式 C 编程以及 Telegram 机器人开发是我的核心领域。",
+    about_p1: "从小到大，我对事物运作原理的好奇心从未停止。理解一个系统的各个部件如何组合在一起，并看着它们协同运作，一直深深吸引着我。机电工程正是这种好奇心的自然归宿——在电子、机械和软件的交汇处工作，对我来说既合乎逻辑又十分自然。随着时间的推移，这种好奇心逐渐从单纯理解系统，发展为将其视为一个整体进行思考，并掌控最终成果。",
+    about_p2: "<p>凭借跨学科的方法，我是一名以系统为核心的工程师，能够端到端地整合嵌入式系统、硬件设计与软件开发。</p><ul class='about-highlights'><li><strong>软件与系统：</strong>以 C 和 Python 为核心的架构、高级 Linux 生态系统以及 Selenium 自动化。</li><li><strong>嵌入式与设计：</strong>使用 KiCad 进行 PCB 设计，使用 SolidWorks 进行机械建模，嵌入式 C 编程，以及 Arduino 和 Raspberry Pi 架构。</li><li><strong>系统集成：</strong>不是孤立地使用单一技术，而是根据需要将硬件、嵌入式软件和自动化层结合起来，打造端到端可运行的解决方案。</li><li><strong>语言能力：</strong>土耳其语（母语）、英语（工作熟练程度）、德语（学习中）。</li></ul>",
     proj_sec_label: "02 / 项目（摘要）",
     proj_sec_title: "精选 <em>作品</em>",
+    proj_cta: "查看 PDF 报告",
     proj_all_btn: "查看所有项目 &rarr;",
     gal_sec_label: "03 / 画廊（摘要）",
     gal_sec_title: "即时 <em>镜头</em>",
+    gal_all: "查看全部",
     gal_all_btn: "前往完整画廊 &rarr;",
-    contact_label: "04 / 联系",
-    contact_title: "建立 <em>连接</em>",
-    contact_lead: "项目想法、技术问题或只是打个招呼——您可以通过以下渠道与我联系。",
+    contact_label: "05 / 联系",
+    contact_title: "建立 <em>联系</em>",
+    contact_lead: "无论是埃斯基谢希尔还是土耳其全境的工程项目、技术问题或合作事宜，都可以通过以下渠道与我联系。",
+    c_note: "// 我可能并非随时都方便接听电话",
     footer_copy: "© 2026 Volkan Tuncer — 卡拉比克大学 · 机电工程",
     footer_sys: "系统在线"
   }
@@ -557,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 6. TERMINAL & ARCADE MOTORU
- ═ **══*═══════════════════════════════════════ */
+ ═ ***══*═══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   const termBody = document.querySelector('.hero-terminal .term-body');
   if (!termBody) return;
@@ -571,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
     inputRow.className = 'tl interactive-row';
     inputRow.style.cssText = 'display:flex; align-items:center;';
     inputRow.innerHTML = `
-    <span class="tl-prompt">volkan@kbu:~$</span>
+    <span class="tl-prompt">volkan@lab:~$</span>
     <div class="term-input-container" style="display:flex; align-items:center; flex:1; margin-left:6px; position:relative;">
     <span class="term-typed-text" style="color:var(--fg); font-family:var(--mono); font-size:0.7rem; white-space:pre;"></span>
     <span class="term-custom-cursor" style="display:inline-block; width:7px; height:13px; background:var(--cyan); margin-left:1px; vertical-align:text-bottom; box-shadow:0 0 10px var(--cyan); animation: cblink 1s step-start infinite;"></span>
@@ -594,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cmd = inputField.value.trim();
         const executedRow = document.createElement('div');
         executedRow.className = 'tl';
-        executedRow.innerHTML = `<span class="tl-prompt">volkan@kbu:~$</span>&nbsp;<span class="tl-cmd" style="color:var(--fg);">${cmd}</span>`;
+        executedRow.innerHTML = `<span class="tl-prompt">volkan@lab:~$</span>&nbsp;<span class="tl-cmd" style="color:var(--fg);">${cmd}</span>`;
         termBody.insertBefore(executedRow, inputRow);
 
         const outputRow = document.createElement('div');

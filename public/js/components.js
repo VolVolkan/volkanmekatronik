@@ -27,9 +27,9 @@ Volkan Tuncer
 <ul id="main-nav-links">
 <li><a href="index.html" data-i18n="nav_home">Anasayfa</a></li>
 <li><a href="index.html#about" data-i18n="nav_about">Hakkımda</a></li>
-<li><a href="projeler.html" data-i18n="nav_projects">Projeler</a></li>
-<li><a href="galeri.html" data-i18n="nav_gallery">Galeri</a></li>
-<li><a href="blog.html" data-i18n="nav_blog">Blog</a></li>
+<li><a href="index.html#projects" data-i18n="nav_projects">Projeler</a></li>
+<li><a href="index.html#gallery" data-i18n="nav_gallery">Galeri</a></li>
+<li><a href="index.html#blog" data-i18n="nav_blog">Blog</a></li>
 <li><a href="index.html#contact" data-i18n="nav_contact">İletişim</a></li>
 </ul>
 
@@ -81,9 +81,8 @@ stroke-linejoin="round">
 
 </div>
 `;
-
 const footerTemplate = `
-<footer>
+<footer class="site-footer">
 
 <div class="footer-ruler"></div>
 
@@ -95,69 +94,30 @@ const footerTemplate = `
 
 <div class="pcb-bg"></div>
 
-<div class="pcb-trace trace-1">
-<div class="data-packet dp-1"></div>
+<div class="pcb-traces">
+<i class="t1"></i><i class="t2"></i><i class="t3"></i>
+<i class="t4"></i><i class="t5"></i><i class="t6"></i>
 </div>
 
-<div class="pcb-trace trace-2">
-<div class="data-packet dp-2"></div>
+<div class="pcb-packets">
+<i class="p1"></i>
+<i class="p2"></i>
+<i class="p3"></i>
 </div>
-
-<div class="pcb-trace trace-3"></div>
-
-<div class="pcb-trace trace-4">
-<div class="data-packet dp-3"></div>
-</div>
-
-<div class="pcb-trace trace-5"></div>
-
-<div class="pcb-trace trace-6">
-<div class="data-packet dp-5"></div>
-</div>
-
-<div class="pcb-trace trace-7"></div>
-
-<div class="pcb-trace trace-8">
-<div class="data-packet dp-4"></div>
-</div>
-
-<div class="pcb-node n-1"></div>
-<div class="pcb-node n-2"></div>
-<div class="pcb-node n-3"></div>
-<div class="pcb-node n-4"></div>
-<div class="pcb-node n-5"></div>
-<div class="pcb-node n-6"></div>
-<div class="pcb-node n-7"></div>
-<div class="pcb-node n-8"></div>
 
 <div class="footer-content">
-
-<div
-class="foot-l"
-data-i18n="footer_copy"
-style="position: relative; z-index: 10;">
-
+<div class="foot-l" data-i18n="footer_copy">
 © 2026 Volkan Tuncer — Karabük Üniversitesi · Mekatronik Mühendisliği
-
 </div>
 
-<div
-class="foot-r"
-style="position: relative; z-index: 10;">
-
+<div class="foot-r">
 <span class="foot-dot"></span>
-
-<span data-i18n="footer_sys">
-Canlı
-</span>
-
+<span data-i18n="footer_sys">Canlı</span>
 </div>
-
 </div>
 
 </footer>
 `;
-
 
 /* ==========================================================================
  * ENTERPRISE CTA — ÇAPRAZ IŞIK EFEKTİ
