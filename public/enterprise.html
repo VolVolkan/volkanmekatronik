@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Volkan Mekatronik — Enterprise</title>
+  <meta name="description" content="Volkan Mekatronik — ileri mühendislik, elektronik, gömülü sistemler, mekanik tasarım ve otomasyon.">
+  <link rel="icon" type="image/webp" href="vmico.webp">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Ana sitenin header/footer ve tema sistemini korur. Enterprise içeriği tamamen namespace'lidir. -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/enterprise.css">
+  <script src="js/components.js" defer></script>
+</head>
+
+<body class="enterprise-page">
+  <!-- Ana sitenin arka plan sistemi -->
+  <canvas id="space-canvas" aria-hidden="true"></canvas>
+  <div class="side-stars side-stars-left" aria-hidden="true"></div>
+  <div class="side-stars side-stars-right" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+  <canvas id="cur-ripple-canvas" aria-hidden="true"></canvas>
+  <div id="cur-wrap" aria-hidden="true"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+
+  <site-header></site-header>
+
+  <main class="vm-page">
+    <section class="vm-hero" id="top">
+      <div class="vm-container">
+        <div class="vm-hero-top">
+          <div class="vm-eyebrow"><i></i> VOLKAN MEKATRONİK</div>
+          <div class="vm-status">ENGINEERING / SYSTEMS / TECHNOLOGY</div>
+        </div>
+
+        <div class="vm-hero-grid">
+          <div class="vm-hero-copy">
+            <p class="vm-kicker">İLERİ MÜHENDİSLİK SİSTEMLERİ</p>
+            <h1>Fikri çalışan<br><em>sisteme</em> dönüştürüyoruz.</h1>
+            <p class="vm-hero-lead">
+              Elektronik, gömülü yazılım, mekanik tasarım ve otomasyonu
+              tek bir sistem mühendisliği yaklaşımında birleştiriyoruz.
+            </p>
+
+            <div class="vm-actions">
+              <a class="vm-btn vm-btn-primary" href="index.html#contact">
+                Projenizi Konuşalım <span>↗</span>
+              </a>
+              <a class="vm-btn vm-btn-secondary" href="#yetkinlikler">
+                Yetkinlikler <span>↓</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="vm-hero-visual" aria-hidden="true">
+            <div class="vm-orbit vm-orbit-a"></div>
+            <div class="vm-orbit vm-orbit-b"></div>
+            <div class="vm-orbit vm-orbit-c"></div>
+            <div class="vm-crosshair vm-crosshair-h"></div>
+            <div class="vm-crosshair vm-crosshair-v"></div>
+
+            <div class="vm-core">
+              <img src="vmorbit.png" alt="Volkan Mekatronik" style="width: 48px; height: 48px; margin-bottom: 6px; border-radius: 8px;">
+              <small>ENGINEERING</small>
+            </div>
+
+            <div class="vm-node vm-node-a">MECHANICAL</div>
+            <div class="vm-node vm-node-b">ELECTRONICS</div>
+            <div class="vm-node vm-node-c">SOFTWARE</div>
+            <div class="vm-node vm-node-d">AUTOMATION</div>
+          </div>
+        </div>
+
+        <div class="vm-hero-meta">
+          <div><b>01</b> SYSTEM THINKING</div>
+          <div><b>02</b> ENGINEERED TO PERFORM</div>
+          <div><b>03</b> BUILT FOR REAL CONDITIONS</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="vm-section vm-positioning">
+      <div class="vm-container">
+        <div class="vm-section-head">
+          <span class="vm-index">01 / YAKLAŞIM</span>
+          <h2>Tek tek parçalar değil,<br><em>bütün sistem.</em></h2>
+        </div>
+
+        <div class="vm-position-grid">
+          <p class="vm-large-text">
+            Bir makinenin yalnızca mekanik, bir kartın yalnızca elektronik
+            veya yazılımın yalnızca kod olarak iyi olması yeterli değildir.
+          </p>
+
+          <div class="vm-copy">
+            <p>
+              Volkan Mekatronik, farklı mühendislik disiplinlerinin kesişiminde
+              çalışan bir teknoloji girişimidir. Problemi önce sistem seviyesinde
+              tanımlar, ardından doğru mimariyi kurarız.
+            </p>
+            <p>
+              Hedefimiz gösterişli prototipler değil; gerçek kullanım koşullarında
+              çalışabilecek, test edilebilir, geliştirilebilir ve sürdürülebilir
+              sistemler tasarlamaktır.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="vm-section vm-capabilities" id="yetkinlikler">
+      <div class="vm-container">
+        <div class="vm-section-head vm-section-head-row">
+          <div>
+            <span class="vm-index">02 / YETKİNLİKLER</span>
+            <h2>Mühendisliğin<br><em>temel katmanları.</em></h2>
+          </div>
+          <p>
+            Projenin ihtiyacına göre tek bir disiplinle veya birden fazla
+            disiplinin birlikte çalıştığı bütünleşik bir mimariyle ilerliyoruz.
+          </p>
+        </div>
+
+        <div class="vm-cap-grid">
+          <article class="vm-cap">
+            <span class="vm-cap-no">01</span>
+            <div class="vm-cap-icon">HW</div>
+            <h3>Elektronik &amp; PCB</h3>
+            <p>Elektronik mimari, devre tasarımı, PCB geliştirme ve prototipleme.</p>
+            <span class="vm-cap-tags">KICAD / EMBEDDED / HARDWARE</span>
+          </article>
+
+          <article class="vm-cap">
+            <span class="vm-cap-no">02</span>
+            <div class="vm-cap-icon">SW</div>
+            <h3>Gömülü Sistemler</h3>
+            <p>Mikrodenetleyiciler, Linux tabanlı sistemler, sensörler ve cihaz yazılımı.</p>
+            <span class="vm-cap-tags">C / PYTHON / LINUX</span>
+          </article>
+
+          <article class="vm-cap">
+            <span class="vm-cap-no">03</span>
+            <div class="vm-cap-icon">CAD</div>
+            <h3>Mekanik Tasarım</h3>
+            <p>3D modelleme, teknik çizim, mekanizma ve üretime uygun parça tasarımı.</p>
+            <span class="vm-cap-tags">CAD / SOLIDWORKS / DFM</span>
+          </article>
+
+          <article class="vm-cap">
+            <span class="vm-cap-no">04</span>
+            <div class="vm-cap-icon">CTL</div>
+            <h3>Otomasyon &amp; Kontrol</h3>
+            <p>Sensör, aktüatör ve kontrol altyapılarını bir araya getiren sistemler.</p>
+            <span class="vm-cap-tags">CONTROL / IOT / AUTOMATION</span>
+          </article>
+
+          <article class="vm-cap">
+            <span class="vm-cap-no">05</span>
+            <div class="vm-cap-icon">LAB</div>
+            <h3>Prototipleme</h3>
+            <p>Konseptten çalışan prototipe uzanan hızlı, ölçülebilir geliştirme süreci.</p>
+            <span class="vm-cap-tags">PROTOTYPE / TESTING / ITERATION</span>
+          </article>
+
+          <article class="vm-cap">
+            <span class="vm-cap-no">06</span>
+            <div class="vm-cap-icon">SYS</div>
+            <h3>Sistem Entegrasyonu</h3>
+            <p>Elektronik, yazılım ve mekanik alt sistemleri çalışan bir üründe birleştirme.</p>
+            <span class="vm-cap-tags">INTEGRATION / RELIABILITY / FIELD</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="vm-section vm-process">
+      <div class="vm-container">
+        <div class="vm-section-head">
+          <span class="vm-index">03 / GELİŞTİRME SÜRECİ</span>
+          <h2>Problemi tanımlar,<br><em>sistemi inşa ederiz.</em></h2>
+        </div>
+
+        <div class="vm-process-line">
+          <article><span>01</span><h3>Keşif</h3><p>İhtiyaç, kullanım senaryosu, teknik kısıtlar ve hedefler belirlenir.</p></article>
+          <article><span>02</span><h3>Mimari</h3><p>Elektronik, yazılım ve mekanik mimari oluşturulur.</p></article>
+          <article><span>03</span><h3>Prototip</h3><p>Hipotezler çalışan prototiplerle test edilir ve iterasyon yapılır.</p></article>
+          <article><span>04</span><h3>Doğrulama</h3><p>Sistem gerçek kullanım koşullarına göre test edilir ve iyileştirilir.</p></article>
+          <article><span>05</span><h3>Ürünleştirme</h3><p>Dokümantasyon, üretilebilirlik ve sürdürülebilirlik için son düzenlemeler yapılır.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="vm-section vm-vision">
+      <div class="vm-container">
+        <div class="vm-vision-box">
+          <div>
+            <span class="vm-index">04 / VİZYON</span>
+            <h2>Türkiye'den doğan,<br><em>mühendislikle büyüyen</em><br>bir teknoloji şirketi.</h2>
+          </div>
+
+          <div class="vm-vision-copy">
+            <p>
+              Bugün mühendislik problemleri üzerinde çalışan bir yapı olarak
+              başladık. Uzun vadeli hedefimiz, geliştirdiğimiz sistemleri
+              tekrarlanabilir ürünlere ve ölçeklenebilir teknoloji çözümlerine
+              dönüştürmek.
+            </p>
+            <div class="vm-vision-mark">
+              <span>VM</span>
+              <small>VOLKAN MEKATRONİK</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="vm-section vm-stage">
+      <div class="vm-container">
+        <div class="vm-stage-grid">
+          <div>
+            <span class="vm-index">05 / GELİŞİM AŞAMASI</span>
+            <h2>İlk adımı<br><em>şimdi atıyoruz.</em></h2>
+          </div>
+
+          <div class="vm-stage-copy">
+            <p>
+              Volkan Mekatronik gelişiminin erken aşamasında. Bu nedenle henüz
+              uzun bir müşteri referans listesi sunmuyoruz.
+            </p>
+            <p>
+              Bunun yerine teknik yetkinliklerimizi gerçek problemler üzerinde
+              çalışan projelere dönüştürmeye, ilk iş ortaklıklarını kurmaya ve
+              ürünleşebilecek fikirleri belirlemeye odaklanıyoruz.
+            </p>
+
+            <div class="vm-stage-status">
+              <span class="vm-pulse"></span>
+              <strong>OPEN FOR COLLABORATION</strong>
+              <small>PROJELER · İŞ ORTAKLIKLARI · TEKNOLOJİ GELİŞTİRME</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="vm-section vm-cta">
+      <div class="vm-container">
+        <div class="vm-cta-box">
+          <span class="vm-index">06 / İLETİŞİM</span>
+          <h2>Bir problemi<br><em>birlikte çözelim.</em></h2>
+          <p>
+            Bir ürün fikriniz, teknik probleminiz veya birlikte geliştirmek
+            istediğiniz bir proje varsa konuşalım.
+          </p>
+          <a class="vm-btn vm-btn-primary" href="index.html#contact">
+            İletişime Geçin <span>↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <site-footer></site-footer>
+  <script src="js/main.js" defer></script>
+</body>
+</html>

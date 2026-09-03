@@ -73,7 +73,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <script src="js/components.js"></script>
+  <script src="js/components.js" defer></script>
 </head>
 <body>
   <canvas id="space-canvas"></canvas>
@@ -163,7 +163,7 @@
             <div class="portrait-frame">
               <div class="portrait-corner tl"></div><div class="portrait-corner tr"></div>
               <div class="portrait-corner bl"></div><div class="portrait-corner br"></div>
-              <img src="pictures/mavi.webp" alt="Volkan Tuncer — Mekatronik Mühendisi" width="400" height="400" loading="lazy">
+              <img src="pictures/mavi.webp" alt="Volkan Tuncer — Mekatronik Mühendisi" width="400" height="400" loading="lazy" decoding="async">
             </div>
             <div class="portrait-badge">KBÜ / MKT-ENG</div>
           </div>
@@ -196,14 +196,14 @@
 
     <div class="s-divider"></div>
     <section class="section">
-      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/electronic.webp" alt="Mekatronik ve Elektronik Tasarım" loading="lazy"></div>
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/electronic.webp" alt="Mekatronik ve Elektronik Tasarım" loading="lazy" decoding="async"></div>
       <div class="section-inner">
         <div class="s-label reveal" data-i18n="proj_sec_label"><span class="s-num">02 /</span> Projeler (Özet)</div>
         <h2 class="s-title reveal d1" data-i18n="proj_sec_title">Öne Çıkan <em>Çalışmalar</em></h2>
         <div class="proj-grid reveal d2">
           <a class="proj-card" href="projeler.html">
             <div class="proj-top-line"></div>
-            <div class="proj-img-wrap"><img src="pictures/project1.webp" alt="ASP.NET Alışveriş Sitesi Projesi" class="proj-img" loading="lazy"></div>
+            <div class="proj-img-wrap"><img src="pictures/project1.webp" alt="ASP.NET Alışveriş Sitesi Projesi" class="proj-img" loading="lazy" decoding="async"></div>
             <div class="proj-body">
               <div class="proj-meta"><span class="proj-idx">PRJ-001</span><div class="proj-sep"></div><span class="proj-cat">Web · ASP.NET</span></div>
               <div class="proj-name">Alışveriş Sitesi</div>
@@ -212,7 +212,7 @@
           </a>
           <a class="proj-card" href="projeler.html">
             <div class="proj-top-line"></div>
-            <div class="proj-img-wrap"><img src="pictures/project3.webp" alt="KiCad PCB Devre Tasarımı Projesi" class="proj-img" loading="lazy"></div>
+            <div class="proj-img-wrap"><img src="pictures/project3.webp" alt="KiCad PCB Devre Tasarımı Projesi" class="proj-img" loading="lazy" decoding="async"></div>
             <div class="proj-body">
               <div class="proj-meta"><span class="proj-idx">PRJ-003</span><div class="proj-sep"></div><span class="proj-cat">Elektronik · KiCad</span></div>
               <div class="proj-name">Devre Tasarımı, Test &amp; PCB</div>
@@ -226,16 +226,16 @@
 
     <div class="s-divider"></div>
     <section class="section">
-      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/mechanic.webp" alt="Mekanik Tasarım Görseli" loading="lazy"></div>
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/mechanic.webp" alt="Mekanik Tasarım Görseli" loading="lazy" decoding="async"></div>
       <div class="section-inner">
         <div class="s-label reveal" data-i18n="gal_sec_label"><span class="s-num">03 /</span> Galeri (Özet)</div>
         <h2 class="s-title reveal d1" data-i18n="gal_sec_title">Anlık <em>Kareler</em></h2>
         <div class="gal-grid reveal d2">
-          <div class="gi gi-tall"><a href="galeri.html"><img src="pictures/gallery1.webp" alt="Volkan Tuncer Çalışma Anı 1" loading="lazy"><div class="gi-label" data-i18n="gal_all">Tümünü Gör</div></a></div>
-          <div class="gi"><a href="galeri.html"><img src="pictures/gallery2.webp" alt="Mekatronik Atölye Çalışması" loading="lazy"></a></div>
-          <div class="gi"><a href="galeri.html"><img src="pictures/gallery3.webp" alt="Elektronik Devre Test Çalışması" loading="lazy"></a></div>
-          <div class="gi"><a href="galeri.html"><img src="pictures/gallery/{03}.webp" alt="PCB Lehimleme ve Tasarım" loading="lazy"></a></div>
-          <div class="gi"><a href="galeri.html"><img src="pictures/gallery/{01}.webp" alt="Robotik Proje Görseli" loading="lazy"></a></div>
+          <div class="gi gi-tall"><a href="galeri.html"><img src="pictures/gallery1.webp" alt="Volkan Tuncer Çalışma Anı 1" loading="lazy" decoding="async"><div class="gi-label" data-i18n="gal_all">Tümünü Gör</div></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery2.webp" alt="Mekatronik Atölye Çalışması" loading="lazy" decoding="async"></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery3.webp" alt="Elektronik Devre Test Çalışması" loading="lazy" decoding="async"></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery/{03}.webp" alt="PCB Lehimleme ve Tasarım" loading="lazy" decoding="async"></a></div>
+          <div class="gi"><a href="galeri.html"><img src="pictures/gallery/{01}.webp" alt="Robotik Proje Görseli" loading="lazy" decoding="async"></a></div>
         </div>
         <a href="galeri.html" class="btn btn-ghost reveal d3" data-i18n="gal_all_btn">Galerinin Tamamına Git &rarr;</a>
       </div>
@@ -243,7 +243,7 @@
 
 <div class="s-divider"></div>
     <section id="contact" class="section">
-      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/world.webp" alt="İletişim Görseli" loading="lazy"></div>
+      <div class="section-theme-bg" aria-hidden="true"><img src="pictures/theme/world.webp" alt="İletişim Görseli" loading="lazy" decoding="async"></div>
       <div class="section-inner">
         <div class="s-label reveal" data-i18n="contact_label"><span class="s-num">04 /</span> İletişim</div>
         <h2 class="s-title reveal d1" data-i18n="contact_title">Bağlantı <em>Kurun</em></h2>

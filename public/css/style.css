@@ -37,6 +37,16 @@
 /* ==========================================================================
  *  2. GENEL ETİKETLER & TIPOGRAFİ
  *  ========================================================================== */
+html {
+  /* Header'daki #about / #contact gibi sayfa-içi bağlantılarda anlık
+   *    zıplama yerine tarayıcının kendi yumuşak kaydırmasını kullan.
+   *    Bu sayede JS tarafındaki parallax uzun bir "yakalama" mesafesi
+   *    boyunca çalışmak zorunda kalmıyor (asıl kasma kaynağıydı). */
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
 body {
   background: var(--ink);
   color: var(--fg);
@@ -62,13 +72,17 @@ body {
  *  ========================================================================== */
 .side-stars { position: fixed; top: 0; bottom: 0; width: clamp(64px, 7vw, 112px); z-index: 2; pointer-events: none; overflow: hidden; opacity: .62; mix-blend-mode: screen; mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%); }
 .side-stars-left { left: 0; } .side-stars-right { right: 0; }
-.side-stars::before, .side-stars::after { content: ''; position: absolute; inset: -30% 0; background-image: radial-gradient(circle at 25% 12%, var(--cyan) 0 1px, transparent 1.7px), radial-gradient(circle at 72% 20%, var(--fg) 0 1px, transparent 1.6px), radial-gradient(circle at 42% 34%, var(--amber) 0 1.1px, transparent 1.8px), radial-gradient(circle at 82% 49%, var(--fg) 0 .9px, transparent 1.5px), radial-gradient(circle at 18% 63%, var(--cyan) 0 .9px, transparent 1.5px), radial-gradient(circle at 58% 78%, var(--fg) 0 1.1px, transparent 1.7px), radial-gradient(circle at 34% 91%, var(--amber) 0 .9px, transparent 1.5px); background-size: 97px 173px, 131px 211px, 113px 197px, 149px 233px, 107px 181px, 137px 219px, 127px 203px; opacity: .7; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--cyan) 55%, transparent)); animation: sideStarDrift 24s linear infinite; }
-.side-stars::after { inset: -10% 0; transform: translateY(15%); opacity: .4; animation-duration: 38s; animation-direction: reverse; }
-.side-stars-right::before { transform: scaleX(-1); animation-duration: 29s; }
-.side-stars-right::after { transform: scaleX(-1) translateY(15%); animation-duration: 43s; }
+/* PERF FIX: artık background-position değil, transform: translateY ile kaydırıyoruz.
+ *  Bu sayede tarayıcı her frame yeniden boyama (repaint) yapmak yerine
+ *  sadece GPU kompozit katmanını kaydırıyor -> kasma/donma büyük ölçüde biter. */
+.side-stars::before, .side-stars::after { content: ''; position: absolute; inset: -30% 0; background-image: radial-gradient(circle at 25% 12%, var(--cyan) 0 1px, transparent 1.7px), radial-gradient(circle at 72% 20%, var(--fg) 0 1px, transparent 1.6px), radial-gradient(circle at 42% 34%, var(--amber) 0 1.1px, transparent 1.8px), radial-gradient(circle at 82% 49%, var(--fg) 0 .9px, transparent 1.5px), radial-gradient(circle at 18% 63%, var(--cyan) 0 .9px, transparent 1.5px), radial-gradient(circle at 58% 78%, var(--fg) 0 1.1px, transparent 1.7px), radial-gradient(circle at 34% 91%, var(--amber) 0 .9px, transparent 1.5px); background-size: 97px 173px, 131px 211px, 113px 197px, 149px 233px, 107px 181px, 137px 219px, 127px 203px; opacity: .7; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--cyan) 55%, transparent)); will-change: transform; animation: sideStarDrift 24s linear infinite; }
+.side-stars::after { inset: -10% 0; opacity: .4; animation-duration: 38s; animation-direction: reverse; }
+.side-stars-right { transform: scaleX(-1); }
+.side-stars-right::before { animation-duration: 29s; }
+.side-stars-right::after { animation-duration: 43s; }
 [data-theme="light"] .side-stars { opacity: 0.12; }
 
-@keyframes sideStarDrift { from { background-position: 0 0, 20px 40px, 0 0, 30px 70px, 10px 0, 40px 90px, 0 30px; } to { background-position: 0 173px, 20px 251px, 0 197px, 30px 303px, 10px 181px, 40px 309px, 0 233px; } }
+@keyframes sideStarDrift { from { transform: translateY(0); } to { transform: translateY(173px); } }
 
 .scroll-progress { position: fixed; top: 64px; right: 0; width: 2px; height: calc(100vh - 64px); z-index: 210; background: color-mix(in srgb, var(--fg) 5%, transparent); pointer-events: none; }
 .scroll-progress span { display: block; width: 100%; height: 0; background: linear-gradient(to bottom, var(--cyan), var(--amber)); box-shadow: 0 0 12px var(--cyan); transform-origin: top; }
@@ -101,6 +115,60 @@ nav {
 .nav-name { font-family: var(--head); font-size: 0.98rem; font-weight: 750; letter-spacing: 0.02em; color: var(--fg); text-decoration: none; transition: color 0.2s; }
 .nav-name:hover { color: var(--cyan); }
 
+/* ---- Header'ın sol tarafındaki "Fikrimiz / Enterprise" CTA butonu ----
+ *  NOT: "Fikrimiz" artık pseudo-element ile üstte değil, butonun İÇİNDE üst
+ *  satır olarak duruyor. Eskiden nav'ın "overflow: hidden" özelliği yüzünden
+ *  üstte taşan etiket kırpılıyor ve küçük/gölgede kalmış görünüyordu. */
+.nav-cta-enterprise {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  margin-left: 14px;
+  padding: 6px 20px;
+  line-height: 1.15;
+  text-decoration: none !important;
+  border-radius: 14px;
+  background: linear-gradient(120deg, var(--cyan), var(--amber), var(--cyan));
+  background-size: 200% 200%;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--cyan) 55%, transparent),
+  0 0 8px color-mix(in srgb, var(--amber) 40%, transparent);
+  animation: navCtaShine 4s ease infinite;
+  transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s ease;
+}
+.nav-cta-enterprise .cta-main {
+  font-family: var(--head);
+  font-size: 0.94rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  text-shadow: 0 0 10px var(--red), 0 0 3px rgba(255,255,255,0.9);
+}
+.nav-cta-enterprise .cta-sub {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  font-weight: 650;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.78);
+}
+.nav-cta-enterprise:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--cyan) 70%, transparent),
+  0 0 14px color-mix(in srgb, var(--amber) 55%, transparent);
+}
+@keyframes navCtaShine {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@media (max-width: 900px) {
+  .nav-cta-enterprise { margin-left: 6px; padding: 5px 14px; }
+  .nav-cta-enterprise .cta-main { font-size: 0.82rem; }
+  .nav-cta-enterprise .cta-sub { font-size: 0.46rem; }
+}
+
 .nav-right { display: flex; align-items: center; gap: 12px; position: relative; z-index: 2; }
 nav ul { list-style: none; display: flex; gap: 4px; }
 nav ul a {
@@ -122,7 +190,7 @@ nav ul a:hover, nav ul a.active { color: var(--cyan) !important; background: col
 
 /* Mekanik Arka Plan Unsurları */
 .mech-overlay { position: absolute; inset: 0; z-index: -2; opacity: 0.12; background-image: linear-gradient(var(--cyan) 1px, transparent 1px), linear-gradient(90deg, var(--cyan) 1px, transparent 1px); background-size: 20px 20px; }
-.hud-scanner { position: absolute; top: 0; left: -100%; width: 150%; height: 100%; z-index: -1; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--cyan) 10%, transparent), color-mix(in srgb, var(--cyan) 35%, transparent) 98%, transparent); animation: scan 6s infinite linear; opacity: 0.8; }
+.hud-scanner { position: absolute; top: 0; left: -150%; width: 150%; height: 100%; z-index: -1; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--cyan) 10%, transparent), color-mix(in srgb, var(--cyan) 35%, transparent) 98%, transparent); animation: scan 6s linear 1 both; opacity: 0.8; }
 .mech-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; z-index: 5; background: repeating-linear-gradient(45deg, var(--amber) 0, var(--amber) 15px, #111 15px, #111 30px); opacity: 0.9; }
 .gear-container { position: absolute; top: -40px; right: 15%; opacity: 0.25; display: flex; align-items: center; pointer-events: none; z-index: -1; }
 .gear-svg { color: var(--amber); animation: spin 10s linear infinite; width: 140px; height: 140px; }
@@ -144,7 +212,7 @@ nav ul a:hover, nav ul a.active { color: var(--cyan) !important; background: col
 /* ==========================================================================
  *  5. BÖLÜMLER & ANASAYFA (HERO & TERMINAL)
  *  ========================================================================== */
-.section { will-change: transform; position: relative; z-index: 1; }
+.section { position: relative; z-index: 1; scroll-margin-top: 84px; }
 .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
 .reveal.vis { opacity: 1; transform: translateY(0); }
 .d1 { transition-delay: 0.1s } .d2 { transition-delay: 0.2s } .d3 { transition-delay: 0.3s } .d4 { transition-delay: 0.4s }
@@ -157,8 +225,9 @@ nav ul a:hover, nav ul a.active { color: var(--cyan) !important; background: col
 .s-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--line2) 30%, var(--line2) 70%, transparent); }
 
 /* ---- Tema fotoğrafları: bölüm arka planları ---- */
-.section-theme-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; opacity: 0.13; }
-[data-theme="dark"] .section-theme-bg { opacity: 0.20; }
+/* Daha belirgin olsunlar diye opaklık artırıldı (eskiden 0.13 / 0.20 idi) */
+.section-theme-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; opacity: 0.38; }
+[data-theme="dark"] .section-theme-bg { opacity: 0.42; }
 .section-theme-bg img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: grayscale(1) contrast(1.1); display: block; }
 .section-theme-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--ink) 0%, transparent 25%, transparent 75%, var(--ink) 100%); }
 .section > .section-inner { position: relative; z-index: 1; }
@@ -451,7 +520,7 @@ footer {
 @keyframes packet-x { 0% { left: 15%; opacity: 1; } 80% { opacity: 1; } 100% { left: 35%; opacity: 0; } }
 @keyframes packet-y-up { 0% { top: 100%; opacity: 1; } 80% { opacity: 1; } 100% { top: -30px; opacity: 0; } }
 @keyframes packet-y-short { 0% { top: 34px; opacity: 1; } 80% { opacity: 1; } 100% { top: 96px; opacity: 0; } }
-@keyframes scan { 0% { transform: translateX(0); } 100% { transform: translateX(200%); } }
+@keyframes scan { 0% { transform: translateX(0); } 100% { transform: translateX(250%); } }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
 
@@ -502,5 +571,18 @@ footer {
   .tag { font-size: 0.62rem; padding: 5px 10px; }
 }
 
-
-
+/* ==========================================================================
+ *  PERFORMANS: DÜŞÜK HAREKET TERCİHİ & CPU TASARRUFU
+ *  Sistem düzeyinde "reduced motion" tercih edilmişse dekoratif, sürekli
+ *  çalışan animasyonları durdurur. Görsel varsayılan davranışı etkilemez.
+ *  ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .side-stars::before, .side-stars::after,
+  .gear-svg, .gear-icon,
+  .nav-cta-enterprise,
+  .pcb-trace .data-packet,
+  .hud-scanner {
+    animation: none !important;
+  }
+  .section { transform: none !important; }
+}
