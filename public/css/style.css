@@ -2418,3 +2418,22 @@ backdrop-filter: blur(7px);
     transform: none !important;
   }
 }
+
+
+/* --- 1. CAM EFEKTİ (BLUR) İPTALİ --- */
+.navbar,
+.menu-wrapper,
+.glass-panel {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: rgba(15, 23, 42, 0.95) !important; /* GPU dostu, yüksek opaklıklı renk */
+}
+
+/* --- 2. AĞIR FİLTRELER VE MASKELERİN İPTALİ --- */
+.side-stars {
+  mix-blend-mode: normal !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  opacity: 0.5 !important; /* Yalnızca şeffaflık ile derinlik veriyoruz */
+}
+

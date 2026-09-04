@@ -1,17 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-
-
   // Header ve mobil menüdeki anchor (#) linkleri için performanslı JS scroll
   document.querySelectorAll('a[href*="#"]').forEach(link => {
     link.addEventListener('click', function(e) {
       const href = this.getAttribute('href');
       if (!href) return;
 
-      // Linki sayfa kısmı ve ID kısmı olarak böl (örn: "index.html" ve "about")
       const [pagePath, targetId] = href.split('#');
 
-      // Geçerli sayfada mıyız kontrol et (href="#about" veya href="index.html#about")
       const isSamePage = !pagePath ||
       window.location.pathname.endsWith(pagePath) ||
       (pagePath === 'index.html' && (window.location.pathname === '/' || window.location.pathname === ''));
@@ -19,14 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isSamePage && targetId) {
         const targetElement = document.getElementById(targetId);
 
-        // Hedef element sayfada varsa müdahale et
         if (targetElement) {
-          e.preventDefault(); // Varsayılan CSS/HTML zıplamasını engelle
+          e.preventDefault();
 
-          // Terminaldeki aynı performanslı scroll fonksiyonu
           targetElement.scrollIntoView({ behavior: 'smooth' });
 
-          // Mobil menü açıksa tıkladıktan sonra otomatik kapat
           const hamburger = document.getElementById('hamburger');
           const mobileMenu = document.getElementById('mobile-menu');
           if (hamburger && hamburger.classList.contains('open')) {
@@ -37,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
   /* ══════════════════════════════════
    *    1. REVEAL ANIMASYONLARI
    * ══════════════════════════════════ */
@@ -44,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     entries.forEach(e => {
       if (e.isIntersecting) {
         e.target.classList.add('vis');
-        observer.unobserve(e.target); // Performans: İşlem bitince izlemeyi bırak
+        observer.unobserve(e.target);
       }
     });
   }, { threshold: 0.1 });
@@ -52,9 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
   /* ══════════════════════════════════
-   *    1b. FOOTER ANİMASYONLARI SADECE GÖRÜNÜRKEN ÇALIŞSIN
-   *    (PCB paket animasyonları sayfanın en altında ama görünmese
-   *    bile sürekli GPU'yu meşgul ediyordu)
+   *    1b. FOOTER ANİMASYONLARI
    * ══════════════════════════════════ */
   const footerEl = document.querySelector('footer');
   if (footerEl) {
@@ -92,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let mx = -200, my = -200, rx = -200, ry = -200, lastMx = -200, lastMy = -200;
     let isMouseDown = false;
-    const MAX_PARTICLES = 90; // Performans: hızlı fare hareketinde patlamayı önle
+    const MAX_PARTICLES = 90;
 
     document.addEventListener('mousemove', e => {
       lastMx = mx; lastMy = my;
@@ -109,21 +101,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, { passive: true });
 
-    let canvasWasCleared = true; // Boşken tekrar tekrar clearRect çağırmamak için
+    let canvasWasCleared = true;
 
     (function tick() {
       if (document.hidden) {
         cursorRAF = requestAnimationFrame(tick);
         return;
       }
-      // GPU hızlandırmalı transform kullanımı (left/top yerine)
       dot.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%) scale(${isMouseDown ? 0.4 : 1})`;
 
       rx += (mx - rx) * 0.15;
       ry += (my - ry) * 0.15;
       ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
 
-      // Performans: parçacık yoksa canvas zaten temizse tekrar çizim/temizleme yapma
       if (stardust.length === 0) {
         if (!canvasWasCleared) {
           rctx.clearRect(0, 0, rc.width, rc.height);
@@ -157,9 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
       cursorRAF = requestAnimationFrame(tick);
     })();
 
-    // Event Delegation ile performanslı hover yönetimi
-    // PERF: nav (header) hariç tutuluyor — navigasyon elemanlarının
-    // hiçbirinde artık hiçbir JS tetiklemesi/durum değişikliği yok.
     const hoverSelectors = 'a, button, .proj-card, .c-card, .gi, .tag, .btn, .theme-toggle';
     document.body.addEventListener('mouseover', e => {
       if (e.target.closest('nav')) return;
@@ -176,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ══════════════════════════════════════════
-   *    3. NEFES ALAN YILDIZLAR (SPACE CANVAS)
+   *    3. STATİK & ESTETİK YILDIZLAR (SPACE CANVAS)
    * ══════════════════════════════════════════ */
   const spaceCanvas = document.getElementById('space-canvas');
   if (spaceCanvas) {
@@ -184,40 +171,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let w = spaceCanvas.width = window.innerWidth;
     let h = spaceCanvas.height = window.innerHeight;
 
-    function resizeSpace() {
-      w = spaceCanvas.width = window.innerWidth;
-      h = spaceCanvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeSpace, { passive: true });
+    const starCount = 100; // Statik olduğu için sayıyı hafif artırdık, daha dolu durur
+    const stars = Array.from({ length: starCount }, () => {
+      const size = Math.random() * 2.5 + 0.5;
+      return {
+        x: Math.random() * w,
+                             y: Math.random() * h,
+                             size: size,
+                             baseAlpha: Math.random() * 0.5 + 0.2,
+                             colorType: Math.random() > 0.85 ? 'amber' : (Math.random() > 0.7 ? 'cyan' : 'white'),
+                             // Sadece belirli boyuttaki yıldızların belli bir kısmı dörtgen olsun (Rastgelelik katıyoruz)
+                             isSparkle: size > 1.5 && Math.random() > 0.65
+      };
+    });
 
-    let scrollYPos = window.scrollY;
-    window.addEventListener('scroll', () => { scrollYPos = window.scrollY; }, { passive: true });
-
-    const starCount = 80; // Performans: iGPU'larda fill-rate maliyetini azaltmak için düşürüldü
-    const stars = Array.from({ length: starCount }, () => ({
-      x: Math.random() * w,
-                                                           y: Math.random() * h,
-                                                           size: Math.random() * 2 + 0.5,
-                                                           baseAlpha: Math.random() * 0.4 + 0.1,
-                                                           speedMultiplier: Math.random() * 0.3 + 0.05,
-                                                           twinkleSpeed: Math.random() * 0.0008 + 0.0003,
-                                                           twinkleOffset: Math.random() * Math.PI * 2,
-                                                           colorType: Math.random() > 0.85 ? 'amber' : (Math.random() > 0.7 ? 'cyan' : 'white')
-    }));
-
-    // Performans: pahalı radyal gradyanı her karede yeniden hesaplamak yerine
-    // ayrı, hareket etmeyen bir arka plan katmanına önceden çiziyoruz.
-    // Sadece boyut/tema/scroll gerçekten değiştiğinde yeniden üretilir.
     const bgCanvas = document.createElement('canvas');
     const bgCtx = bgCanvas.getContext('2d');
-    let lastBgKey = '';
 
     function drawBackgroundLayer() {
       bgCanvas.width = w;
       bgCanvas.height = h;
       const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
       const bgGrad = bgCtx.createRadialGradient(
-        w * 0.5, h * 0.3 + scrollYPos * 0.1, 50,
+        w * 0.5, h * 0.3, 50,
         w * 0.5, h * 0.5, Math.max(w, h)
       );
       if (isLightMode) { bgGrad.addColorStop(0, '#f8fafc'); bgGrad.addColorStop(1, '#e2e8f0'); }
@@ -225,75 +201,113 @@ document.addEventListener('DOMContentLoaded', () => {
       bgCtx.fillStyle = bgGrad;
       bgCtx.fillRect(0, 0, w, h);
     }
-    drawBackgroundLayer();
 
-    // ~20fps hedefi + boşta tamamen durdurma: yıldız titreşimi çok yavaş
-    // olduğu için göze fark etmez, ama canvas pikselleri değişmeyince
-    // arkasındaki backdrop-filter (#about, hero-terminal vb.) da boşuna
-    // yeniden hesaplanmaz — asıl sürekli "kasma" kaynağı buydu.
-    const FRAME_INTERVAL = 1000 / 20;
-    const IDLE_TIMEOUT = 2200; // ms — bu süre etkileşim olmazsa yıldızlar donar
-    let lastFrameTime = 0;
-    let isTabVisible = !document.hidden;
-    let lastActivityTime = performance.now();
-    const markSpaceActivity = () => { lastActivityTime = performance.now(); };
-    window.addEventListener('scroll', markSpaceActivity, { passive: true });
-    window.addEventListener('mousemove', markSpaceActivity, { passive: true });
-    window.addEventListener('touchstart', markSpaceActivity, { passive: true });
-    window.addEventListener('keydown', markSpaceActivity, { passive: true });
+    // Estetik 4 Köşeli Yıldız Çizici (Daha sivri, zarif uçlar)
+    function drawFourPointStar(ctx, cx, cy, outerRadius, innerRadius, color) {
+      let rot = (Math.PI / 2) * 3;
+      let x = cx;
+      let y = cy;
+      const step = Math.PI / 4;
 
-    function animateSpace(time) {
-      spaceRAF = requestAnimationFrame(animateSpace);
-      if (!isTabVisible) return;
-      if (time - lastActivityTime > IDLE_TIMEOUT) return; // boşta: son kareyi koru, hiç çizme
-      if (time - lastFrameTime < FRAME_INTERVAL) return;
-      lastFrameTime = time;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < 4; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
 
-      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
-      // Scroll'u kabaca 40px'lik adımlara yuvarlayarak gereksiz yeniden çizimi önle
-      const bgKey = isLightMode + '|' + Math.round(scrollYPos / 40) + '|' + w + '|' + h;
-      if (bgKey !== lastBgKey) {
-        drawBackgroundLayer();
-        lastBgKey = bgKey;
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
       }
+      ctx.lineTo(cx, cy - outerRadius);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
 
+    // Statik Çizim Fonksiyonu
+    function renderStaticSpace() {
+      drawBackgroundLayer();
       sCtx.clearRect(0, 0, w, h);
       sCtx.drawImage(bgCanvas, 0, 0);
 
-      stars.forEach(star => {
-        let currentY = (star.y - scrollYPos * star.speedMultiplier) % h;
-        if (currentY < 0) currentY += h;
+      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
 
-        const sineWave = (Math.sin(time * star.twinkleSpeed + star.twinkleOffset) + 1) / 2;
-        const currentAlpha = star.baseAlpha + (sineWave * 0.6);
+      stars.forEach(star => {
+        const currentAlpha = Math.min(star.baseAlpha + 0.2, 0.9);
 
         let rgbCol = isLightMode ? '15, 23, 42' : '255, 255, 255';
-        if (star.colorType === 'cyan') rgbCol = isLightMode ? '0, 131, 163' : '0, 229, 255';
-        if (star.colorType === 'amber') rgbCol = isLightMode ? '184, 113, 10' : '255, 184, 48';
+        let hexShadow = isLightMode ? '#0f172a' : '#ffffff';
 
-        sCtx.beginPath();
-        sCtx.arc(star.x, currentY, star.size, 0, Math.PI * 2);
-        sCtx.fillStyle = `rgba(${rgbCol}, ${currentAlpha})`;
-        sCtx.fill();
+        if (star.colorType === 'cyan') {
+          rgbCol = isLightMode ? '0, 131, 163' : '0, 229, 255';
+          hexShadow = isLightMode ? '#0083a3' : '#00e5ff'; // Işıma (Bloom) için hex renkleri
+        }
+        if (star.colorType === 'amber') {
+          rgbCol = isLightMode ? '184, 113, 10' : '255, 184, 48';
+          hexShadow = isLightMode ? '#b8710a' : '#ffb830';
+        }
 
-        if (star.size > 1.2 && !isLightMode) {
-          const glowSize = star.size + (sineWave * 3);
+        const starColor = `rgba(${rgbCol}, ${currentAlpha})`;
+
+        // Sadece seçilmiş (isSparkle) yıldızları dörtgen yap
+        if (star.isSparkle) {
+          const outerR = star.size * 3.5; // Çok daha belirgin ve uzun dış uçlar
+          const innerR = star.size * 0.15; // Çok ince iç kısımlar (zarif lens parlaması görünümü)
+
+      sCtx.save(); // Diğer yıldızları etkilememesi için save()
+
+      if (!isLightMode) {
+        // Statik canvas'ın nimetlerinden faydalanıp gerçek ışıma efekti ekliyoruz
+        sCtx.shadowBlur = outerR * 2.5;
+        sCtx.shadowColor = hexShadow;
+      }
+
+      // Yıldızın kendi şekli
+      drawFourPointStar(sCtx, star.x, star.y, outerR, innerR, starColor);
+
+      // Merkeze parlak beyaz/açık renk bir çekirdek (daha gerçekçi durur)
+      sCtx.beginPath();
+      sCtx.arc(star.x, star.y, innerR * 1.5, 0, Math.PI * 2);
+      sCtx.fillStyle = `rgba(255, 255, 255, ${currentAlpha + 0.2})`;
+      sCtx.fill();
+
+      sCtx.restore(); // Shadow efektini sadece bu yıldıza hapsediyoruz
+
+        } else {
+          // Normal yıldızlar dairesel nokta kalır
           sCtx.beginPath();
-          sCtx.arc(star.x, currentY, glowSize * 2, 0, Math.PI * 2);
-          sCtx.fillStyle = `rgba(${rgbCol}, ${currentAlpha * 0.15})`;
+          sCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+          sCtx.fillStyle = starColor;
           sCtx.fill();
+
+          // Hafif büyük ama dörtgen olmayan normal daire yıldızlara ufak bir aura
+          if (star.size > 1.8 && !isLightMode) {
+            sCtx.beginPath();
+            sCtx.arc(star.x, star.y, star.size * 2.5, 0, Math.PI * 2);
+            sCtx.fillStyle = `rgba(${rgbCol}, 0.15)`;
+            sCtx.fill();
+          }
         }
       });
     }
-    spaceRAF = requestAnimationFrame(animateSpace);
 
-    document.addEventListener('visibilitychange', () => {
-      isTabVisible = !document.hidden;
-    });
+    // İlk çizim
+    renderStaticSpace();
+
+    // Sadece ekran boyutu değişirse tekrar çiz
+    window.addEventListener('resize', () => {
+      w = spaceCanvas.width = window.innerWidth;
+      h = spaceCanvas.height = window.innerHeight;
+      renderStaticSpace();
+    }, { passive: true });
   }
 
   /* ══════════════════════════════════════════
-   *    4. SCROLL DEPTH / PARALLAX (SIFIR REFLOW)
+   *    4. SCROLL DEPTH / PARALLAX
    * ══════════════════════════════════════════ */
   const progressBar = document.querySelector('.scroll-progress span');
   const sideStars = document.querySelectorAll('.side-stars');
@@ -304,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let maxScroll = 1;
   let windowHeight = window.innerHeight;
 
-  // Element koordinatlarını önceden hesapla
   let sectionsData = [];
   function cacheSectionMetrics() {
     windowHeight = window.innerHeight;
@@ -322,10 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateScrollMotion() {
     const newScroll = window.scrollY;
-    // Büyük sıçramalarda (header'daki #about/#contact linkleri, "git" tuşu vb.)
-    // parallax'ın saniyelerce süren yavaş "yakalama" animasyonuna girmesini
-    // engelle — efekt zaten en fazla ±14px kaydırdığı için sıçrama fark
-    // edilmeden anında hedefe oturtulabilir. Asıl kasma buradaydı.
     if (Math.abs(newScroll - targetScroll) > 250) {
       visualScroll = newScroll;
     }
@@ -343,7 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function animateScrollDepth() {
       visualScroll += (targetScroll - visualScroll) * 0.075;
 
-      // DOM okuması (getBoundingClientRect) yapmadan direkt matematiksel parallax
       for (let i = 0; i < sectionsData.length; i++) {
         const sec = sectionsData[i];
         const distance = (sec.centerTop - visualScroll) - windowHeight / 2;
@@ -356,9 +364,6 @@ document.addEventListener('DOMContentLoaded', () => {
         rail.style.transform = `translate3d(0, ${drift}px, 0)`;
       });
 
-      // Performans: hedefe ulaşılınca döngüyü durdur, sonsuza kadar
-      // gereksiz yere CPU/GPU (blur/composite) tüketmesin. Yeni bir scroll
-      // olduğunda otomatik olarak tekrar başlar.
       if (Math.abs(targetScroll - visualScroll) < 0.3) {
         visualScroll = targetScroll;
         scrollDepthRunning = false;
@@ -371,9 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function ensureScrollDepthRunning() {
       if (!scrollDepthRunning) {
         scrollDepthRunning = true;
-        // Yalnızca aktif hareket sırasında GPU katmanı iste; sürekli açık
-        // bırakmak (özellikle backdrop-filter içeren bölümlerde) sayfa
-        // kapanışını/geçişini de gereksiz yere ağırlaştırıyordu.
         for (let i = 0; i < sectionsData.length; i++) sectionsData[i].el.style.willChange = 'transform';
         scrollDepthRAF = requestAnimationFrame(animateScrollDepth);
       }
@@ -385,9 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ══════════════════════════════════════════
    *    5. SAYFADAN ÇIKARKEN ANİMASYONLARI ANINDA DURDUR
-   *    (Header'daki linkler tıklanınca "kasma" hissi buradan geliyordu:
-   *    tıklama anında hâlâ arka planda çalışan canvas/parallax döngüleri
-   *    ana thread'i meşgul edip yeni sayfaya geçişi geciktiriyordu.)
    * ══════════════════════════════════════════ */
   function stopAllLoops() {
     if (cursorRAF) cancelAnimationFrame(cursorRAF);
@@ -395,18 +394,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (scrollDepthRAF) cancelAnimationFrame(scrollDepthRAF);
   }
 
-  // Sayfa içi (#) linkler hariç, gerçek bir sayfa geçişi yapan her tıklamada
-  // ağır döngüleri hemen durdur ki tarayıcı geçişi anında/akıcı yapabilsin.
   document.addEventListener('click', e => {
     const link = e.target.closest('a[href]');
     if (!link) return;
     const href = link.getAttribute('href');
     if (!href || link.target === '_blank') return;
-    // Sayfayı yenilemeyen bağlantı türleri (mail, telefon, js) dokunma
     if (/^(mailto:|tel:|javascript:)/i.test(href)) return;
-    // "index.html#contact" gibi linkler aslında AYNI sayfada kalıp sadece
-    // kaydırıyor — gerçekten farklı bir belgeye gidilmiyorsa döngüleri
-    // durdurma (bu, mouse'un kaybolmasına sebep olan hataydı).
+
     const normalize = p => p.replace(/\/index\.html$/i, '/').replace(/\/+$/, '') || '/';
     if (link.host === location.host && normalize(link.pathname) === normalize(location.pathname)) {
       return;
@@ -419,8 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 5. ÇEVİRİ SÖZLÜĞÜ (i18n)
- *    index.html'deki güncel TR içeriğinden üretildi (05.09.2026 güncellemesi).
- ═ ***══*═══════════════════════════════════════ */
+ * ══════════════════════════════════════════ */
 const dict = {
   tr: {
     nav_chip: "MKT · ENG",
@@ -570,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 6. TERMINAL & ARCADE MOTORU
- ═ ***══*═══════════════════════════════════════ */
+ * ═ *══*═══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   const termBody = document.querySelector('.hero-terminal .term-body');
   if (!termBody) return;
@@ -584,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
     inputRow.className = 'tl interactive-row';
     inputRow.style.cssText = 'display:flex; align-items:center;';
     inputRow.innerHTML = `
-    <span class="tl-prompt">volkan@lab:~$</span>
+    <span class="tl-prompt">volkan@kbu:~$</span>
     <div class="term-input-container" style="display:flex; align-items:center; flex:1; margin-left:6px; position:relative;">
     <span class="term-typed-text" style="color:var(--fg); font-family:var(--mono); font-size:0.7rem; white-space:pre;"></span>
     <span class="term-custom-cursor" style="display:inline-block; width:7px; height:13px; background:var(--cyan); margin-left:1px; vertical-align:text-bottom; box-shadow:0 0 10px var(--cyan); animation: cblink 1s step-start infinite;"></span>
@@ -607,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cmd = inputField.value.trim();
         const executedRow = document.createElement('div');
         executedRow.className = 'tl';
-        executedRow.innerHTML = `<span class="tl-prompt">volkan@lab:~$</span>&nbsp;<span class="tl-cmd" style="color:var(--fg);">${cmd}</span>`;
+        executedRow.innerHTML = `<span class="tl-prompt">volkan@kbu:~$</span>&nbsp;<span class="tl-cmd" style="color:var(--fg);">${cmd}</span>`;
         termBody.insertBefore(executedRow, inputRow);
 
         const outputRow = document.createElement('div');
