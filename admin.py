@@ -11,8 +11,9 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'yedek_anahtar_123')
 
-# Görsellerin kaydedileceği ana dizin
-BASE_UPLOAD_FOLDER = 'pictures'
+# --- DİZİN YAPILANDIRMASI ---
+PUBLIC_DIR = 'public'
+BASE_UPLOAD_FOLDER = os.path.join(PUBLIC_DIR, 'pictures')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
 def allowed_file(filename):
@@ -20,8 +21,8 @@ def allowed_file(filename):
 
 def save_image_to_folder(file_storage, subfolder):
     """
-    Dosyayı güvenli hale getirir ve belirtilen alt klasöre kaydeder.
-    Örn: pictures/blog/foto.webp, pictures/projects/kamera.png
+    Dosyayı güvenli hale getirir ve public/pictures/alt_klasor içine kaydeder.
+    HTML'de kullanmak üzere bağıl yol döner: pictures/blog/foto.webp
     """
     if not file_storage or file_storage.filename == '':
         return None
@@ -29,14 +30,12 @@ def save_image_to_folder(file_storage, subfolder):
     if allowed_file(file_storage.filename):
         filename = secure_filename(file_storage.filename)
 
-        # Target folder: pictures/blog, pictures/projects veya pictures/gallery
         target_dir = os.path.join(BASE_UPLOAD_FOLDER, subfolder)
         os.makedirs(target_dir, exist_ok=True)
 
         save_path = os.path.join(target_dir, filename)
         file_storage.save(save_path)
 
-        # HTML içinde kullanılacak bağıl yol (örn: pictures/blog/resim.jpg)
         return f"pictures/{subfolder}/{filename}".replace("\\", "/")
     return None
 
@@ -45,19 +44,19 @@ def format_blog_content(raw_text):
     if not raw_text:
         return ""
 
-    # Paragraflara böl (çift alt satıra göre)
     paragraphs = [p.strip() for p in raw_text.split('\n\n') if p.strip()]
     formatted_paragraphs = []
 
     for p in paragraphs:
-        # Eğer zaten bir HTML elementi içeriyorsa dokunma
         if p.startswith('<p>') or p.startswith('blockquote') or p.startswith('<figure>'):
             formatted_paragraphs.append(p)
             continue
 
-        # Hex kodları (0x99CA38 vb.) otomatik <code> içine al
-        p = re.sub(r'(0x[0-9A-Fa-f]{6})', r'<code style="background: rgba(255,255,255,0.08); color: var(--cyan, #00f0ff); padding: 3px 8px; border-radius: 4px; font-family: var(--mono); border: 1px solid rgba(255,255,255,0.1);">\1</code>', p)
-
+        p = re.sub(
+            r'(0x[0-9A-Fa-f]{6})',
+            r'<code style="background: rgba(255,255,255,0.08); color: var(--cyan, #00f0ff); padding: 3px 8px; border-radius: 4px; font-family: var(--mono); border: 1px solid rgba(255,255,255,0.1);">\1</code>',
+            p
+        )
         formatted_paragraphs.append(f'<p style="margin-bottom: 20px;">{p}</p>')
 
     return '\n'.join(formatted_paragraphs)
@@ -108,7 +107,7 @@ ADMIN_HTML = """
     input, textarea, button { display: block; width: 100%; margin-bottom: 15px; padding: 12px; background: #111620; border: 1px solid rgba(0,229,255,0.25); color: #fff; font-family: inherit; box-sizing: border-box; }
     button { background: #00e5ff; color: #05070a; cursor: pointer; font-weight: bold; text-transform: uppercase; border: none; }
     button:hover { background: #e6bd73; }
-    .note { font-size: 0.8rem; color: #718094; margin-top: -10px; margin-bottom: 15px; display: block; }
+    .note { font-size: 0.82rem; color: #8a99ad; margin-top: -10px; margin-bottom: 15px; display: block; line-height: 1.4; }
   </style>
 </head>
 <body>
@@ -121,13 +120,17 @@ ADMIN_HTML = """
   <!-- BLOG EKLEME -->
   <div class="box">
       <h3>> Yeni Blog Yazısı Ekle</h3>
-      <span class="note">İpucu: Yazının içine [FOTO] eklersen fotoğraf oraya yerleşir. Eklemeyi unutursan yazının başında çıkar.</span>
+      <span class="note">
+        💡 <b>Fotoğraf İpucu:</b> Birden fazla fotoğraf seçebilirsin.<br>
+        Metnin içinde [1] yazarsan 1. fotoğraf, [2] yazarsan 2. fotoğraf oraya yerleşir.<br>
+        1. yüklediğin fotoğraf aynı zamanda blog kartının kapağı olur.
+      </span>
       <form action="/add_blog" method="post" enctype="multipart/form-data">
         <input type="text" name="title" placeholder="Yazı Başlığı (Örn: Gömülü Sistemler)" required>
         <input type="text" name="slug" placeholder="URL Adı (Örn: gomulu-sistemler)" required>
         <input type="text" name="summary" placeholder="Kısa Özet (Blog listesinde görünecek)" required>
-        <textarea name="content" rows="8" placeholder="Metninizi paragraflar arası bir satır boşluk bırakarak yazın..." required></textarea>
-        <input type="file" name="blog_img" accept="image/png, image/jpeg, image/webp">
+        <textarea name="content" rows="10" placeholder="Metninizi yazın... Görseller için istediğiniz yere [1], [2] vb. ekleyin." required></textarea>
+        <input type="file" name="blog_imgs" accept="image/png, image/jpeg, image/webp" multiple>
         <button type="submit">Yazıyı Yayınla</button>
       </form>
   </div>
@@ -204,17 +207,21 @@ def is_logged_in():
 
 def get_turkish_date():
     now = datetime.datetime.now()
-    aylar = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylul", "Ekim", "Kasım", "Aralık"]
+    aylar = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
     return f"{now.day} {aylar[now.month]} {now.year}"
 
-def inject_html(filename, marker, injection_code):
-    """Belirtilen HTML dosyasını okur, markerı bulur ve hemen altına yeni kodu ekler."""
-    if not os.path.exists(filename): return False
-    with open(filename, 'r', encoding='utf-8') as f:
+def inject_html(relative_filename, marker, injection_code):
+    """public/ dizini altındaki HTML dosyasını okur, markerı bulur ve kodu ekler."""
+    target_path = os.path.join(PUBLIC_DIR, relative_filename)
+    if not os.path.exists(target_path):
+        return False
+
+    with open(target_path, 'r', encoding='utf-8') as f:
         content = f.read()
+
     if marker in content:
         content = content.replace(marker, marker + "\n" + injection_code, 1)
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(target_path, 'w', encoding='utf-8') as f:
             f.write(content)
         return True
     return False
@@ -248,44 +255,73 @@ def add_blog():
     if not is_logged_in(): return redirect(url_for('login'))
 
     title = request.form['title']
-    slug = secure_filename(request.form['slug']) + '.html'
+    slug_filename = secure_filename(request.form['slug']) + '.html'
     summary = request.form['summary']
     raw_content = request.form['content']
     date_str = get_turkish_date()
 
-    # Fotoğraf İşleme -> pictures/blog/ altına kaydeder
-    img_html = ""
-    if 'blog_img' in request.files:
-        file_path = save_image_to_folder(request.files['blog_img'], 'blog')
-        if file_path:
-            img_html = f'''
-          <figure style="margin: 0 0 30px 0;">
-            <img src="{file_path}" alt="{title}" style="width:100%; height:auto; border-radius:12px; border:1px solid var(--line2, #333); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display:block;">
-          </figure>'''
+    # Çoklu Fotoğraf Yükleme İşlemi
+    uploaded_files = request.files.getlist('blog_imgs')
+    saved_images = []
 
-    # İçeriği tipografik HTML formatına çevir
+    for file_storage in uploaded_files:
+        path = save_image_to_folder(file_storage, 'blog')
+        if path:
+            saved_images.append(path)
+
     formatted_body = format_blog_content(raw_content)
 
-    if '[FOTO]' in formatted_body:
-        final_content = formatted_body.replace('[FOTO]', img_html)
-    else:
-        final_content = img_html + "\n" + formatted_body
+    # [1], [2] etiketlerini HTML figure elemanlarına dönüştürme
+    used_indices = set()
 
-    # Sayfayı Üret
+    for idx, img_path in enumerate(saved_images, start=1):
+        placeholder = f'[{idx}]'
+        figure_html = f'''
+        <figure style="margin: 30px 0;">
+          <img src="{img_path}" alt="{title} - Görsel {idx}" style="width:100%; height:auto; border-radius:12px; border:1px solid var(--line2, #333); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display:block;">
+        </figure>'''
+
+        if placeholder in formatted_body:
+            formatted_body = formatted_body.replace(placeholder, figure_html)
+            used_indices.add(idx)
+
+    # Eğer metin içine yerleştirilmemiş fotoğraflar varsa onları makale başına ekleyelim
+    unused_figures = []
+    for idx, img_path in enumerate(saved_images, start=1):
+        if idx not in used_indices:
+            unused_figures.append(f'''
+            <figure style="margin: 0 0 30px 0;">
+              <img src="{img_path}" alt="{title} - Görsel {idx}" style="width:100%; height:auto; border-radius:12px; border:1px solid var(--line2, #333); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display:block;">
+            </figure>''')
+
+    final_content = "\n".join(unused_figures) + "\n" + formatted_body
+
+    # Blog yazısının bağımsız HTML sayfasını üret
     full_html = PAGE_TEMPLATE.format(title=title, date=date_str, content=final_content)
-    with open(slug, 'w', encoding='utf-8') as f:
+    public_page_path = os.path.join(PUBLIC_DIR, slug_filename)
+
+    with open(public_page_path, 'w', encoding='utf-8') as f:
         f.write(full_html)
 
-    # blog.html listesine ekle
+    # public/blog.html kartını hazırlama (ilk fotoğraf kapak yapılır)
+    card_img_html = ""
+    if saved_images:
+        cover_image = saved_images[0]
+        card_img_html = f'''
+            <div class="blog-img-wrap">
+              <img src="{cover_image}" alt="{title}" class="blog-img">
+            </div>'''
+
     card = f"""
-          <a href="{slug}" class="blog-card">
+          <a href="{slug_filename}" class="blog-card">{card_img_html}
             <span class="blog-date">{date_str}</span>
             <h3 class="blog-title">{title}</h3>
             <p class="blog-excerpt">{summary}</p>
           </a>"""
+
     inject_html('blog.html', '<div class="blog-grid reveal d2">', card)
 
-    return redirect(url_for('index', msg=f'Blog başarıyla oluşturuldu: {slug}'))
+    return redirect(url_for('index', msg=f'Blog başarıyla oluşturuldu: {slug_filename}'))
 
 @app.route('/add_project', methods=['POST'])
 def add_project():
@@ -296,7 +332,6 @@ def add_project():
     idx = request.form['idx']
     link = request.form['link']
 
-    # Proje resmi -> pictures/projects/ altına kaydeder
     file_path = save_image_to_folder(request.files['proj_img'], 'projects')
     if not file_path:
         return redirect(url_for('index', msg='Hata: Proje fotoğrafı yüklenemedi!'))
@@ -321,7 +356,6 @@ def add_gallery():
 
     label = request.form['label']
 
-    # Galeri resmi -> pictures/gallery/ altına kaydeder
     file_path = save_image_to_folder(request.files['gal_img'], 'gallery')
     if not file_path:
         return redirect(url_for('index', msg='Hata: Galeri fotoğrafı yüklenemedi!'))

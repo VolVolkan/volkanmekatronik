@@ -14,231 +14,138 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
   /* ══════════════════════════════════
-   *    2. ÖZEL İMLEÇ & YILDIZ TOZU (STARDUST)
+   *    1b. FOOTER ANİMASYONLARI SADECE GÖRÜNÜRKEN ÇALIŞSIN
+   *    (PCB paket animasyonları sayfanın en altında ama görünmese
+   *    bile sürekli GPU'yu meşgul ediyordu)
    * ══════════════════════════════════ */
-  const isFine = window.matchMedia('(pointer: fine)').matches;
-  let stardust = [];
-  let cursorRAF = null;
-  let spaceRAF = null;
-  let scrollDepthRAF = null;
-
-  if (isFine && document.getElementById('cur-wrap')) {
-    const wrap = document.getElementById('cur-wrap');
-    const dot  = document.getElementById('cur-dot');
-    const ring = document.getElementById('cur-ring');
-    const rc   = document.getElementById('cur-ripple-canvas');
-    const rctx = rc.getContext('2d');
-
-    const updateCanvasSize = () => {
-      rc.width  = window.innerWidth;
-      rc.height = window.innerHeight;
-    };
-    updateCanvasSize();
-    window.addEventListener('resize', updateCanvasSize, { passive: true });
-
-    let mx = -200, my = -200, rx = -200, ry = -200, lastMx = -200, lastMy = -200;
-    let isMouseDown = false;
-    const MAX_PARTICLES = 90; // Performans: hızlı fare hareketinde patlamayı önle
-
-    document.addEventListener('mousemove', e => {
-      lastMx = mx; lastMy = my;
-      mx = e.clientX; my = e.clientY;
-
-      if (stardust.length < MAX_PARTICLES && (Math.abs(mx - lastMx) > 2 || Math.abs(my - lastMy) > 2)) {
-        stardust.push({
-          x: mx + (Math.random() - 0.5) * 10,
-                      y: my + (Math.random() - 0.5) * 10,
-                      size: Math.random() * 2 + 0.5,
-                      life: 1,
-                      decay: Math.random() * 0.03 + 0.015
-        });
-      }
-    }, { passive: true });
-
-    let canvasWasCleared = true; // Boşken tekrar tekrar clearRect çağırmamak için
-
-    (function tick() {
-      if (document.hidden) {
-        cursorRAF = requestAnimationFrame(tick);
-        return;
-      }
-      // GPU hızlandırmalı transform kullanımı (left/top yerine)
-      dot.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%) scale(${isMouseDown ? 0.4 : 1})`;
-
-      rx += (mx - rx) * 0.15;
-      ry += (my - ry) * 0.15;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
-
-      // Performans: parçacık yoksa canvas zaten temizse tekrar çizim/temizleme yapma
-      if (stardust.length === 0) {
-        if (!canvasWasCleared) {
-          rctx.clearRect(0, 0, rc.width, rc.height);
-          canvasWasCleared = true;
-        }
-        cursorRAF = requestAnimationFrame(tick);
-        return;
-      }
-
-      rctx.clearRect(0, 0, rc.width, rc.height);
-      canvasWasCleared = false;
-      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
-      const particleColor = wrap.classList.contains('hov')
-      ? (isLightMode ? '184, 113, 10' : '255, 184, 48')
-      : (isLightMode ? '0, 131, 163' : '0, 229, 255');
-
-      for (let i = stardust.length - 1; i >= 0; i--) {
-        const p = stardust[i];
-        p.life -= p.decay;
-        if (p.life <= 0) {
-          stardust.splice(i, 1);
-          continue;
-        }
-        p.y += 0.5;
-        rctx.beginPath();
-        rctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        rctx.fillStyle = `rgba(${particleColor}, ${p.life})`;
-        rctx.fill();
-      }
-
-      cursorRAF = requestAnimationFrame(tick);
-    })();
-
-    // Event Delegation ile performanslı hover yönetimi
-    const hoverSelectors = 'a, button, .proj-card, .c-card, .gi, .tag, .btn, .theme-toggle';
-    document.body.addEventListener('mouseover', e => {
-      if (e.target.closest(hoverSelectors)) wrap.classList.add('hov');
-    }, { passive: true });
-
-      document.body.addEventListener('mouseout', e => {
-        if (e.target.closest(hoverSelectors)) wrap.classList.remove('hov');
-      }, { passive: true });
-
-        document.addEventListener('mousedown', () => { isMouseDown = true; }, { passive: true });
-        document.addEventListener('mouseup', () => { isMouseDown = false; }, { passive: true });
+  const footerEl = document.querySelector('footer');
+  if (footerEl) {
+    const footerIO = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        footerEl.style.setProperty('--footer-anim-state', entry.isIntersecting ? 'running' : 'paused');
+        footerEl.classList.toggle('footer-in-view', entry.isIntersecting);
+      });
+    }, { threshold: 0 });
+    footerIO.observe(footerEl);
   }
 
+  let scrollDepthRAF = null;
+
   /* ══════════════════════════════════════════
-   *    3. NEFES ALAN YILDIZLAR (SPACE CANVAS)
+   *    3. SABİT UZAY YILDIZLARI (TEK SEFERLİK, STATİK)
+   *    Not: Artık animasyon/scroll döngüsü yok. Sayfa yüklenince ve
+   *    pencere yeniden boyutlandığında/tema değiştiğinde bir kez
+   *    çizilip öylece kalıyor — fotoğraf gibi sabit.
    * ══════════════════════════════════════════ */
   const spaceCanvas = document.getElementById('space-canvas');
   if (spaceCanvas) {
     const sCtx = spaceCanvas.getContext('2d');
-    let w = spaceCanvas.width = window.innerWidth;
-    let h = spaceCanvas.height = window.innerHeight;
+    let w, h, stars;
 
-    function resizeSpace() {
+    function buildStars() {
+      const starCount = 80;
+      return Array.from({ length: starCount }, () => {
+        const r = Math.random();
+        // Yıldızların %15'i dört köşeli, %25'i dörtgen, kalanı yuvarlak
+        let shape = 'circle';
+        if (r > 0.85) shape = 'fourPoint';
+        else if (r > 0.6) shape = 'rect';
+
+        return {
+          x: Math.random() * w,
+                        y: Math.random() * h,
+                        size: Math.random() * 2 + 0.5,
+                        baseAlpha: Math.random() * 0.5 + 0.3,
+                        colorType: Math.random() > 0.85 ? 'amber' : (Math.random() > 0.7 ? 'cyan' : 'white'),
+                        shape: shape
+        };
+      });
+    }
+
+    function drawSpaceOnce() {
       w = spaceCanvas.width = window.innerWidth;
       h = spaceCanvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeSpace, { passive: true });
+      if (!stars) stars = buildStars();
 
-    let scrollYPos = window.scrollY;
-    window.addEventListener('scroll', () => { scrollYPos = window.scrollY; }, { passive: true });
-
-    const starCount = 130;
-    const stars = Array.from({ length: starCount }, () => ({
-      x: Math.random() * w,
-                                                           y: Math.random() * h,
-                                                           size: Math.random() * 2 + 0.5,
-                                                           baseAlpha: Math.random() * 0.4 + 0.1,
-                                                           speedMultiplier: Math.random() * 0.3 + 0.05,
-                                                           twinkleSpeed: Math.random() * 0.0008 + 0.0003,
-                                                           twinkleOffset: Math.random() * Math.PI * 2,
-                                                           colorType: Math.random() > 0.85 ? 'amber' : (Math.random() > 0.7 ? 'cyan' : 'white')
-    }));
-
-    // Performans: pahalı radyal gradyanı her karede yeniden hesaplamak yerine
-    // ayrı, hareket etmeyen bir arka plan katmanına önceden çiziyoruz.
-    // Sadece boyut/tema/scroll gerçekten değiştiğinde yeniden üretilir.
-    const bgCanvas = document.createElement('canvas');
-    const bgCtx = bgCanvas.getContext('2d');
-    let lastBgKey = '';
-
-    function drawBackgroundLayer() {
-      bgCanvas.width = w;
-      bgCanvas.height = h;
       const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
-      const bgGrad = bgCtx.createRadialGradient(
-        w * 0.5, h * 0.3 + scrollYPos * 0.1, 50,
+
+      // Arka plan gradyanı
+      const bgGrad = sCtx.createRadialGradient(
+        w * 0.5, h * 0.3, 50,
         w * 0.5, h * 0.5, Math.max(w, h)
       );
       if (isLightMode) { bgGrad.addColorStop(0, '#f8fafc'); bgGrad.addColorStop(1, '#e2e8f0'); }
       else { bgGrad.addColorStop(0, '#090e17'); bgGrad.addColorStop(0.5, '#05070a'); bgGrad.addColorStop(1, '#020305'); }
-      bgCtx.fillStyle = bgGrad;
-      bgCtx.fillRect(0, 0, w, h);
-    }
-    drawBackgroundLayer();
-
-    // ~20fps hedefi + boşta tamamen durdurma: yıldız titreşimi çok yavaş
-    // olduğu için göze fark etmez, ama canvas pikselleri değişmeyince
-    // arkasındaki backdrop-filter (#about, hero-terminal vb.) da boşuna
-    // yeniden hesaplanmaz — asıl sürekli "kasma" kaynağı buydu.
-    const FRAME_INTERVAL = 1000 / 20;
-    const IDLE_TIMEOUT = 2200; // ms — bu süre etkileşim olmazsa yıldızlar donar
-    let lastFrameTime = 0;
-    let isTabVisible = !document.hidden;
-    let lastActivityTime = performance.now();
-    const markSpaceActivity = () => { lastActivityTime = performance.now(); };
-    window.addEventListener('scroll', markSpaceActivity, { passive: true });
-    window.addEventListener('mousemove', markSpaceActivity, { passive: true });
-    window.addEventListener('touchstart', markSpaceActivity, { passive: true });
-    window.addEventListener('keydown', markSpaceActivity, { passive: true });
-
-    function animateSpace(time) {
-      spaceRAF = requestAnimationFrame(animateSpace);
-      if (!isTabVisible) return;
-      if (time - lastActivityTime > IDLE_TIMEOUT) return; // boşta: son kareyi koru, hiç çizme
-      if (time - lastFrameTime < FRAME_INTERVAL) return;
-      lastFrameTime = time;
-
-      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
-      // Scroll'u kabaca 40px'lik adımlara yuvarlayarak gereksiz yeniden çizimi önle
-      const bgKey = isLightMode + '|' + Math.round(scrollYPos / 40) + '|' + w + '|' + h;
-      if (bgKey !== lastBgKey) {
-        drawBackgroundLayer();
-        lastBgKey = bgKey;
-      }
-
-      sCtx.clearRect(0, 0, w, h);
-      sCtx.drawImage(bgCanvas, 0, 0);
+      sCtx.fillStyle = bgGrad;
+      sCtx.fillRect(0, 0, w, h);
 
       stars.forEach(star => {
-        let currentY = (star.y - scrollYPos * star.speedMultiplier) % h;
-        if (currentY < 0) currentY += h;
-
-        const sineWave = (Math.sin(time * star.twinkleSpeed + star.twinkleOffset) + 1) / 2;
-        const currentAlpha = star.baseAlpha + (sineWave * 0.6);
+        const currentY = star.y;
+        const currentAlpha = star.baseAlpha;
 
         let rgbCol = isLightMode ? '15, 23, 42' : '255, 255, 255';
         if (star.colorType === 'cyan') rgbCol = isLightMode ? '0, 131, 163' : '0, 229, 255';
         if (star.colorType === 'amber') rgbCol = isLightMode ? '184, 113, 10' : '255, 184, 48';
 
         sCtx.beginPath();
-        sCtx.arc(star.x, currentY, star.size, 0, Math.PI * 2);
+        if (star.shape === 'fourPoint') {
+          const s = star.size * 2; // Dört köşeli yıldız için uzantı boyutu
+          sCtx.moveTo(star.x, currentY - s);
+          sCtx.quadraticCurveTo(star.x, currentY, star.x + s, currentY);
+          sCtx.quadraticCurveTo(star.x, currentY, star.x, currentY + s);
+          sCtx.quadraticCurveTo(star.x, currentY, star.x - s, currentY);
+          sCtx.quadraticCurveTo(star.x, currentY, star.x, currentY - s);
+        } else if (star.shape === 'rect') {
+          sCtx.rect(star.x - star.size, currentY - star.size, star.size * 2, star.size * 2);
+        } else {
+          sCtx.arc(star.x, currentY, star.size, 0, Math.PI * 2);
+        }
         sCtx.fillStyle = `rgba(${rgbCol}, ${currentAlpha})`;
         sCtx.fill();
 
+        // Büyük yıldızlar için sabit arka plan parlaması (glow)
         if (star.size > 1.2 && !isLightMode) {
-          const glowSize = star.size + (sineWave * 3);
+          const glowSize = star.size * 2.5;
           sCtx.beginPath();
-          sCtx.arc(star.x, currentY, glowSize * 2, 0, Math.PI * 2);
+          if (star.shape === 'fourPoint') {
+            const gs = glowSize * 1.5;
+            sCtx.moveTo(star.x, currentY - gs);
+            sCtx.quadraticCurveTo(star.x, currentY, star.x + gs, currentY);
+            sCtx.quadraticCurveTo(star.x, currentY, star.x, currentY + gs);
+            sCtx.quadraticCurveTo(star.x, currentY, star.x - gs, currentY);
+            sCtx.quadraticCurveTo(star.x, currentY, star.x, currentY - gs);
+          } else if (star.shape === 'rect') {
+            sCtx.rect(star.x - glowSize, currentY - glowSize, glowSize * 2, glowSize * 2);
+          } else {
+            sCtx.arc(star.x, currentY, glowSize * 2, 0, Math.PI * 2);
+          }
           sCtx.fillStyle = `rgba(${rgbCol}, ${currentAlpha * 0.15})`;
           sCtx.fill();
         }
       });
     }
-    spaceRAF = requestAnimationFrame(animateSpace);
 
-    document.addEventListener('visibilitychange', () => {
-      isTabVisible = !document.hidden;
-    });
+    drawSpaceOnce();
+
+    // Yalnızca pencere yeniden boyutlandığında tekrar çiz (debounce'lu).
+    // Scroll veya mousemove artık tetiklemiyor — tamamen statik.
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        stars = null; // yeni boyuta göre yıldızları yeniden dağıt
+        drawSpaceOnce();
+      }, 200);
+    }, { passive: true });
+
+    // Tema değişince renkleri güncellemek için tek seferlik yeniden çizim
+    const themeObserver = new MutationObserver(() => drawSpaceOnce());
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   }
-
   /* ══════════════════════════════════════════
    *    4. SCROLL DEPTH / PARALLAX (SIFIR REFLOW)
    * ══════════════════════════════════════════ */
   const progressBar = document.querySelector('.scroll-progress span');
-  const sideStars = document.querySelectorAll('.side-stars');
   const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let targetScroll = window.scrollY;
@@ -293,11 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sec.el.style.transform = `translate3d(0, ${shift}px, 0)`;
       }
 
-      sideStars.forEach((rail, index) => {
-        const drift = visualScroll * (index === 0 ? 0.055 : -0.045);
-        rail.style.transform = `translate3d(0, ${drift}px, 0)`;
-      });
-
       // Performans: hedefe ulaşılınca döngüyü durdur, sonsuza kadar
       // gereksiz yere CPU/GPU (blur/composite) tüketmesin. Yeni bir scroll
       // olduğunda otomatik olarak tekrar başlar.
@@ -332,8 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
    *    ana thread'i meşgul edip yeni sayfaya geçişi geciktiriyordu.)
    * ══════════════════════════════════════════ */
   function stopAllLoops() {
-    if (cursorRAF) cancelAnimationFrame(cursorRAF);
-    if (spaceRAF) cancelAnimationFrame(spaceRAF);
     if (scrollDepthRAF) cancelAnimationFrame(scrollDepthRAF);
   }
 
@@ -361,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 5. ÇEVİRİ SÖZLÜĞÜ (i18n)
- ═ *══*═══════════════════════════════════════ */
+ ═ **══*═══════════════════════════════════════ */
 const dict = {
   tr: {
     nav_chip: "MKT · ENG",
@@ -499,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 6. TERMINAL & ARCADE MOTORU
- ═ *══*═══════════════════════════════════════ */
+ ═ **══*═══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   const termBody = document.querySelector('.hero-terminal .term-body');
   if (!termBody) return;
@@ -688,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
  * 7. HEADER MECHA-BOT (SITELER ARASI OPTİMİZE)
- ═ *══*═══════════════════════════════════════ */
+ ═ **══*═══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   const nav = document.querySelector('nav');
   if (!nav) return;

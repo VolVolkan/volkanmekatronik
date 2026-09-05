@@ -29,11 +29,11 @@ Volkan Tuncer
 </div>
 <ul id="main-nav-links">
 <li><a href="index.html" data-i18n="nav_home">Anasayfa</a></li>
-<li><a href="index.html#about" data-i18n="nav_about">Hakkımda</a></li>
+<li><a href="#about" data-i18n="nav_about">Hakkımda</a></li>
 <li><a href="projeler.html" data-i18n="nav_projects">Projeler</a></li>
 <li><a href="galeri.html" data-i18n="nav_gallery">Galeri</a></li>
 <li><a href="blog.html" data-i18n="nav_blog">Blog</a></li>
-<li><a href="index.html#contact" data-i18n="nav_contact">İletişim</a></li>
+<li><a href="#contact" data-i18n="nav_contact">İletişim</a></li>
 </ul>
 <button class="theme-toggle" id="theme-toggle" aria-label="Açık/koyu temayı değiştir">
 <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -54,7 +54,6 @@ Volkan Tuncer
 <a href="index.html#contact" data-i18n="nav_contact">İletişim</a>
 </div>
 `;
-
 const footerTemplate = `
 <footer>
 <div class="footer-ruler"></div>
@@ -64,6 +63,8 @@ const footerTemplate = `
 <span>100.00</span>
 </div>
 <div class="pcb-bg"></div>
+
+<!-- PCB Yolları ve Veri Paketleri -->
 <div class="pcb-trace trace-1"><div class="data-packet dp-1"></div></div>
 <div class="pcb-trace trace-2"><div class="data-packet dp-2"></div></div>
 <div class="pcb-trace trace-3"></div>
@@ -72,6 +73,8 @@ const footerTemplate = `
 <div class="pcb-trace trace-6"><div class="data-packet dp-5"></div></div>
 <div class="pcb-trace trace-7"></div>
 <div class="pcb-trace trace-8"><div class="data-packet dp-4"></div></div>
+
+<!-- PCB Düğümleri -->
 <div class="pcb-node n-1"></div>
 <div class="pcb-node n-2"></div>
 <div class="pcb-node n-3"></div>
@@ -82,12 +85,11 @@ const footerTemplate = `
 <div class="pcb-node n-8"></div>
 
 <div class="footer-content">
-<div class="foot-l" data-i18n="footer_copy" style="position: relative; z-index: 10;">© 2026 Volkan Tuncer — Karabük Üniversitesi · Mekatronik Mühendisliği</div>
-<div class="foot-r" style="position: relative; z-index: 10;"><span class="foot-dot"></span> <span data-i18n="footer_sys">Canlı</span></div>
+<div class="foot-l" data-i18n="footer_copy">© 2026 Volkan Tuncer — Karabük Üniversitesi · Mekatronik Mühendisliği</div>
+<div class="foot-r"><span class="foot-dot"></span> <span data-i18n="footer_sys">Canlı</span></div>
 </div>
 </footer>
 `;
-
 class SiteHeader extends HTMLElement {
   connectedCallback() {
     this.innerHTML = headerTemplate;

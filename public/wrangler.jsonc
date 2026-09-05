@@ -1,7 +1,0 @@
-{
-  "name": "proje-adin",
-  "compatibility_date": "2026-09-02",
-  "assets": {
-    "directory": "./" // Veya sitenin dosyaları 'public'/'dist' içindeyse "./public" yap
-  }
-}
