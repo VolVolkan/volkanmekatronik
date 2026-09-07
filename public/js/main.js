@@ -682,6 +682,78 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (lowerCmd === 'matrix') {
           outputRow.innerHTML = `<span class="tl-ok">Matrix protokolü çalıştırılıyor...</span>`;
           runMatrixRainSmooth();
+        } else if (lowerCmd === 'rm -rf /') {
+          isTerminalLocked = true;
+          inputField.disabled = true;
+          outputRow.innerHTML = `<span style="color:var(--red); font-weight:bold; animation: cblink 0.1s step-start infinite;">[ CRITICAL ] SİSTEM SİLİNİYOR... ROOT ERİŞİMİ SAĞLANDI!</span>`;
+          termBody.insertBefore(outputRow, inputRow);
+          // Yeni satır (log) ekleme kodlarını tamamen sildik. Artık aşağı inme (enter basma) etkisi yok.
+
+          // 1. AŞAMA: Scroll direnci ve Ekran Sallantısı (Jitter)
+          const crazyScroll = (e) => {
+            e.preventDefault();
+            window.scrollBy((Math.random() - 0.5) * 50, (Math.random() - 0.5) * 50);
+          };
+          window.addEventListener('wheel', crazyScroll, { passive: false });
+          window.addEventListener('touchmove', crazyScroll, { passive: false });
+
+          const style = document.createElement('style');
+          style.innerHTML = `@keyframes crashShake { 0% { transform: translate(3px, 2px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -2px) rotate(-1deg); } 60% { transform: translate(-3px, 2px) rotate(0deg); } 80% { transform: translate(3px, -1px) rotate(1deg); } 100% { transform: translate(-1px, 2px) rotate(-1deg); } }`;
+          document.head.appendChild(style);
+          document.body.style.animation = 'crashShake 0.1s infinite';
+
+          // 2. AŞAMA: Düzeni BOZMADAN çok hızlıca olduğu yerde silikleşme
+          const allElements = document.querySelectorAll('h1, h2, h3, p, img, a, span:not(.term-typed-text), li, .proj-card, .c-card, .gi, .tag');
+
+          // Sadece opacity ve blur kullanıyoruz, scale/transform YOK. Yeri asla değişmez.
+          allElements.forEach(el => {
+            el.style.transition = 'opacity 0.4s ease, filter 0.4s ease';
+          });
+
+          const chaosInterval = setInterval(() => {
+            const randomEl = allElements[Math.floor(Math.random() * allElements.length)];
+
+            if (randomEl && randomEl.style.opacity !== '0') {
+              randomEl.style.opacity = '0';
+              randomEl.style.filter = 'blur(10px)';
+              randomEl.style.pointerEvents = 'none';
+            }
+
+            // Arka plan hızlıca siyah-kırmızı titreşir
+            document.body.style.backgroundColor = Math.random() > 0.5 ? '#110000' : '#000000';
+          }, 5); // Aşırı hızlı silinmesi için süreyi 5ms'ye çektim
+
+          // 3. AŞAMA: Siyah Arka Plan & Kırmızı KERNEL PANIC (2 Saniye Sonra)
+          setTimeout(() => {
+            clearInterval(chaosInterval);
+            window.removeEventListener('wheel', crazyScroll);
+            window.removeEventListener('touchmove', crazyScroll);
+
+            document.body.style.animation = 'none';
+            document.body.style.transition = 'none';
+            document.body.style.transform = 'none';
+            document.body.style.filter = 'none';
+
+            document.body.innerHTML = `
+            <div style="background-color: #000000; color: #ff0000; font-family: 'Courier New', Courier, monospace; height: 100vh; width: 100vw; display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; z-index: 99999999; padding: 5vw; box-sizing: border-box; text-align: center; overflow: hidden;">
+            <h1 style="color: #ff0000; font-size: clamp(3rem, 10vw, 7rem); letter-spacing: 5px; margin-bottom: 20px; text-shadow: 0 0 20px #ff0000; text-transform: uppercase;">Kernel Panic</h1>
+
+            <p style="font-size: clamp(1.2rem, 4vw, 2.5rem); margin-bottom: 30px; font-weight: bold; text-shadow: 0 0 10px #ff0000;">*** FATAL EXCEPTION: SYSTEM DESTROYED ***</p>
+
+            <p style="font-size: 1.2rem; margin-bottom: 10px; color: #dd0000;">VFS: Unable to mount root fs on unknown-block(0,0)</p>
+            <p style="font-size: 1.2rem; margin-bottom: 40px; color: #dd0000;">All data on volume '/' has been completely erased.</p>
+
+            <p style="font-size: 1.8rem; margin-top: 30px; font-weight: bold;">System Halted.</p>
+            <p style="font-size: 1rem; margin-top: 20px; color: #550000;">(Press F5 to reboot... if you still can)</p>
+            <p style="font-size: 3rem; margin-top: 20px; animation: blink 0.5s step-start infinite;">_</p>
+            </div>
+            <style>@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }</style>
+            `;
+          }, 2000); // 5.5 saniye olan süreyi çok hızlı olması için 2 saniyeye indirdim
+
+          inputField.value = '';
+          typedTextSpan.textContent = '';
+          return;
         } else if (lowerCmd === 'hack') {
           isTerminalLocked = true;
           inputField.disabled = true;

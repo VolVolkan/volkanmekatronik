@@ -123,17 +123,16 @@ class SiteHeader extends HTMLElement {
         });
       });
     }
-
     // 3. Tema Değiştirici Mantığı
     const root = document.documentElement;
     const themeToggle = this.querySelector("#theme-toggle");
 
     const setTheme = (theme) => {
-      if (theme === "light") root.setAttribute("data-theme", "light");
-      else root.removeAttribute("data-theme");
-      try {
-        localStorage.setItem("theme", theme);
-      } catch (e) {}
+      if (theme === "light") {
+        root.setAttribute("data-theme", "light");
+      } else {
+        root.removeAttribute("data-theme");
+      }
     };
 
     if (themeToggle) {
@@ -142,35 +141,6 @@ class SiteHeader extends HTMLElement {
         setTheme(isLight ? "dark" : "light");
       });
     }
-
-    // Kayıtlı Temayı Uygula
-    try {
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "light") root.setAttribute("data-theme", "light");
-    } catch (e) {}
-
-    // 4. Dil Değiştirici (Lang Switch) Mantığı
-    const langBtns = this.querySelectorAll(".lang-btn");
-    const setLanguage = (lang) => {
-      langBtns.forEach((btn) => {
-        btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
-      });
-      try {
-        localStorage.setItem("preferred_lang", lang);
-      } catch (e) {}
-
-      // i18n sistemi varsa tetikle
-      if (typeof window.changeLanguage === "function") {
-        window.changeLanguage(lang);
-      }
-    };
-
-    langBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const selectedLang = btn.getAttribute("data-lang");
-        setLanguage(selectedLang);
-      });
-    });
 
     // Kayıtlı Dili Yükle
     try {
