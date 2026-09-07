@@ -76,6 +76,43 @@
   <script src="js/components.js" defer></script>
 </head>
 <body>
+  <!-- ══════════════════════════════════════════
+       ÖN YÜKLEME EKRANI (PRELOADER)
+       Site (görseller dahil) tamamen yüklenene kadar gösterilir.
+       main.js içindeki window 'load' event'i tetiklenince
+       body'e "site-ready" class'ı eklenir ve bu ekran gizlenir
+       (DOM'dan SİLİNMEZ — sadece opacity/visibility ile kapanır).
+       Ağır efektler (canvas yıldızlar, scroll-parallax, reveal
+       animasyonları, terminal/arcade, mecha-bot, footer PCB
+       animasyonu) da bu ana kadar hiç başlamaz.
+  ═══════════════════════════════════════════ -->
+  <div id="site-preloader" aria-hidden="true">
+    <div class="preloader-grid"></div>
+    <div class="preloader-scene">
+      <div class="preloader-ring-wrap">
+        <svg class="preloader-ring" viewBox="0 0 120 120">
+          <circle class="preloader-ring-track" cx="60" cy="60" r="52"></circle>
+          <circle class="preloader-ring-fill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="preloader-mark">
+          <span class="preloader-mark-text">VT</span>
+        </div>
+      </div>
+
+      <div class="preloader-status">
+        <span class="preloader-label">SİSTEM BAŞLATILIYOR</span><span class="preloader-cursor"></span>
+      </div>
+
+      <div class="preloader-bar"><span id="preloader-bar-fill"></span></div>
+
+      <div class="preloader-meta">
+        <span class="preloader-pct"><span id="preloader-pct-num">0</span>%</span>
+        <span class="preloader-sep">//</span>
+        <span class="preloader-tag">MKT · ENG</span>
+      </div>
+    </div>
+  </div>
+
   <canvas id="space-canvas"></canvas>
   <div class="side-stars side-stars-left" aria-hidden="true"></div>
   <div class="side-stars side-stars-right" aria-hidden="true"></div>
@@ -193,7 +230,8 @@
     </section>
 
     <div class="s-divider"></div>
-    <section class="section">
+    <!-- Projeler id'si eklendi -->
+    <section id="projects" class="section">
       <div class="section-inner">
         <div class="s-label reveal" data-i18n="proj_sec_label"><span class="s-num">02 /</span> Projeler (Özet)</div>
         <h2 class="s-title reveal d1" data-i18n="proj_sec_title">Öne Çıkan <em>Çalışmalar</em></h2>
@@ -222,7 +260,194 @@
     </section>
 
     <div class="s-divider"></div>
-    <section class="section">
+
+        <!-- BLOG -->
+    <section class="section" id="blog">
+      <div class="section-theme-bg" aria-hidden="true">
+      </div>
+
+      <div class="section-inner">
+
+        <div class="s-label reveal">
+          <span class="s-num">04 /</span> Blog &amp; Makaleler
+        </div>
+
+        <h2 class="s-title reveal d1">
+          Volkan<em>'dan</em> <em> Notlar</em>
+        </h2>
+
+        <p class="contact-lead reveal d2">
+          Mühendislik, teknoloji, bilim ve merak ettiğim konular üzerine yazılar.
+        </p>
+
+        <div class="proj-grid reveal d3">
+
+          <!-- BLOG 1 -->
+          <a class="proj-card" href="blog.html">
+            <div class="proj-top-line"></div>
+
+            <div class="proj-img-wrap">
+              <img
+                src="pictures/blog/tesla-bobini.jpg"
+                alt="Tesla Bobini"
+                class="proj-img"
+                loading="lazy"
+                decoding="async">
+            </div>
+
+            <div class="proj-body">
+              <div class="proj-meta">
+                <span class="proj-idx">BLOG-001</span>
+                <div class="proj-sep"></div>
+                <span class="proj-cat">Bilim · Elektronik</span>
+              </div>
+
+              <div class="proj-name">
+                Görsel Şölenin Arkasındaki Deha: Tesla Bobini
+              </div>
+
+              <div class="proj-cta">
+                Makaleyi Oku &rarr;
+              </div>
+            </div>
+          </a>
+
+          <!-- BLOG 2 -->
+          <a class="proj-card" href="blog.html">
+            <div class="proj-top-line"></div>
+
+            <div class="proj-img-wrap">
+              <img
+                src="pictures/blog/germanyum.webp"
+                alt="Germanyum"
+                class="proj-img"
+                loading="lazy"
+                decoding="async">
+            </div>
+
+            <div class="proj-body">
+              <div class="proj-meta">
+                <span class="proj-idx">BLOG-002</span>
+                <div class="proj-sep"></div>
+                <span class="proj-cat">Teknoloji · Malzeme</span>
+              </div>
+
+              <div class="proj-name">
+                Periyodik Cetvelin Gizli Stratejisti: Germanyum
+              </div>
+
+              <div class="proj-cta">
+                Makaleyi Oku &rarr;
+              </div>
+            </div>
+          </a>
+
+        </div>
+
+        <a href="blog.html" class="btn btn-ghost reveal d4">
+          Tüm Makalelere Git &rarr;
+        </a>
+
+      </div>
+    </section>
+
+    <div class="s-divider"></div>
+    <!-- BLOG -->
+
+        <!-- BLOG -->
+    <section class="section" id="blog">
+      <div class="section-theme-bg" aria-hidden="true">
+      </div>
+
+      <div class="section-inner">
+
+        <div class="s-label reveal">
+          <span class="s-num">04 /</span> Blog &amp; Makaleler
+        </div>
+
+        <h2 class="s-title reveal d1">
+          Volkan<em>'dan</em> <em> Notlar</em>
+        </h2>
+
+        <p class="contact-lead reveal d2">
+          Mühendislik, teknoloji, bilim ve merak ettiğim konular üzerine yazılar.
+        </p>
+
+        <div class="proj-grid reveal d3">
+
+          <!-- BLOG 1 -->
+          <a class="proj-card" href="blog.html">
+            <div class="proj-top-line"></div>
+
+            <div class="proj-img-wrap">
+              <img
+                src="pictures/blog/tesla-bobini.jpg"
+                alt="Tesla Bobini"
+                class="proj-img"
+                loading="lazy"
+                decoding="async">
+            </div>
+
+            <div class="proj-body">
+              <div class="proj-meta">
+                <span class="proj-idx">BLOG-001</span>
+                <div class="proj-sep"></div>
+                <span class="proj-cat">Bilim · Elektronik</span>
+              </div>
+
+              <div class="proj-name">
+                Görsel Şölenin Arkasındaki Deha: Tesla Bobini
+              </div>
+
+              <div class="proj-cta">
+                Makaleyi Oku &rarr;
+              </div>
+            </div>
+          </a>
+
+          <!-- BLOG 2 -->
+          <a class="proj-card" href="blog.html">
+            <div class="proj-top-line"></div>
+
+            <div class="proj-img-wrap">
+              <img
+                src="pictures/blog/germanyum.webp"
+                alt="Germanyum"
+                class="proj-img"
+                loading="lazy"
+                decoding="async">
+            </div>
+
+            <div class="proj-body">
+              <div class="proj-meta">
+                <span class="proj-idx">BLOG-002</span>
+                <div class="proj-sep"></div>
+                <span class="proj-cat">Teknoloji · Malzeme</span>
+              </div>
+
+              <div class="proj-name">
+                Periyodik Cetvelin Gizli Stratejisti: Germanyum
+              </div>
+
+              <div class="proj-cta">
+                Makaleyi Oku &rarr;
+              </div>
+            </div>
+          </a>
+
+        </div>
+
+        <a href="blog.html" class="btn btn-ghost reveal d4">
+          Tüm Makalelere Git &rarr;
+        </a>
+
+      </div>
+    </section>
+
+    <div class="s-divider"></div>
+
+    <!-- Galeri id'si eklendi -->
+    <section id="gallery" class="section">
       <div class="section-inner">
         <div class="s-label reveal" data-i18n="gal_sec_label"><span class="s-num">03 /</span> Galeri (Özet)</div>
         <h2 class="s-title reveal d1" data-i18n="gal_sec_title">Anlık <em>Kareler</em></h2>

@@ -2,9 +2,121 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Galeri — Volkan Tuncer</title>
+  <h1 class="ed-title">Saha <em>Notları</em></h1>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/style.css">
   <script src="js/components.js"></script>
+
+  <style>
+    /* ==========================================================================
+     *  FOTOĞRAFÇI PORTFOLYOSU BAŞLIK STİLİ
+     * ========================================================================== */
+    .photo-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 160px 24px 80px;
+    }
+    .photo-title {
+      font-family: var(--head, sans-serif);
+      font-size: clamp(3rem, 7vw, 5rem);
+      font-weight: 800;
+      color: var(--fg);
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      line-height: 1.05;
+    }
+    .photo-title em {
+      font-family: 'Fraunces', serif;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--cyan);
+    }
+    .photo-desc {
+      font-family: var(--body);
+      font-size: 1.1rem;
+      color: var(--fg2);
+      line-height: 1.85;
+      font-weight: 400;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+     *  GALERİ MİZANPAJI
+     * ========================================================================== */
+    .field-wrap { --serif: 'Fraunces', serif; display: flex; flex-direction: column; gap: 90px; }
+    .field-block { position: relative; }
+
+    .field-hero { position: relative; overflow: hidden; aspect-ratio: 16 / 7.5; border-radius: 4px; background: var(--surface); }
+    .field-hero img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(20%) brightness(0.8); transform: scale(1.01); transition: filter 0.8s ease, transform 4s ease; }
+    .field-hero:hover img { filter: grayscale(0%) brightness(0.95); transform: scale(1.03); }
+    .field-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%); pointer-events: none; }
+    .field-hero-content { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 25px 35px; }
+    .field-hero-title { font-family: var(--head); font-weight: 700; font-size: clamp(1.5rem, 3vw, 2.2rem); color: #fff; letter-spacing: -0.01em; }
+    .field-hero-sub { font-family: var(--body); font-size: 0.9rem; color: rgba(255,255,255,0.75); margin-top: 8px; }
+    .field-hero-frame { position: absolute; top: 20px; right: 28px; z-index: 2; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.8); padding: 5px 10px; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(4px); }
+
+    .field-photo { position: relative; overflow: hidden; border-radius: 4px; background: var(--surface); display: block; cursor: pointer; }
+    .field-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(15%) brightness(0.9); transition: filter 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    .field-photo:hover img { filter: grayscale(0%) brightness(1); transform: scale(1.03); }
+
+    .fp-frame { position: absolute; top: 16px; left: 16px; z-index: 2; font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.15em; color: #fff; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); opacity: 0; transition: all 0.3s; }
+    .field-photo:hover .fp-frame { opacity: 1; }
+
+    .field-photo figcaption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 30px 20px 15px; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8)); display: flex; flex-direction: column; gap: 4px; transform: translateY(10px); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none; }
+    .field-photo.has-caption:hover figcaption { opacity: 1; transform: translateY(0); }
+    .fp-species { font-family: var(--head); font-weight: 600; font-size: 1.1rem; color: #fff; }
+    .fp-meta { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: var(--cyan); text-transform: uppercase; margin-top: 2px;}
+
+    .fr-split, .fr-reverse { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; align-items: start; }
+    .fr-reverse { grid-template-columns: 1fr 1.5fr; }
+    .fr-split .field-photo:first-child, .fr-reverse .field-photo:last-child { aspect-ratio: 16 / 10; }
+    .fr-split .field-photo:last-child, .fr-reverse .field-photo:first-child { aspect-ratio: 3 / 4; margin-top: 30px; }
+
+    .fr-trio { display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: repeat(2, 1fr); gap: 20px; }
+    .fr-trio .field-photo:first-child { grid-row: 1 / 3; aspect-ratio: 3 / 4.2; }
+    .fr-trio .field-photo:nth-child(2), .fr-trio .field-photo:nth-child(3) { aspect-ratio: 16 / 9; }
+
+    .fr-full .field-photo { aspect-ratio: 21 / 9; }
+    .fr-full .field-photo figcaption { padding: 40px 30px 20px; }
+    .fr-full .fp-species { font-size: 1.4rem; }
+
+    .fr-quote { max-width: 600px; margin: 10px auto; text-align: center; padding: 10px 20px; }
+    .fr-quote p { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(1.2rem, 2vw, 1.5rem); line-height: 1.6; color: var(--fg); }
+    .fr-quote cite { display: inline-block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg3); margin-top: 15px; }
+    .fr-quote cite::before { content: '— '; color: var(--cyan); }
+
+    .lightbox-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(12, 16, 23, 0.95); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .lightbox-overlay.open { opacity: 1; pointer-events: auto; }
+    .lightbox-frame { position: relative; max-width: 1200px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+    .lightbox-frame img { max-width: 100%; max-height: 80vh; object-fit: contain; opacity: 0; transform: scale(0.98); transition: all 0.3s ease; }
+    .lightbox-overlay.open .lightbox-frame img { opacity: 1; transform: scale(1); }
+    .lightbox-caption { text-align: center; }
+    .lightbox-caption .lb-species { font-family: var(--head); font-weight: 600; font-size: 1.1rem; color: #fff; }
+    .lightbox-caption .lb-meta { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: var(--cyan); margin-top: 6px; text-transform: uppercase;}
+    .lightbox-close, .lightbox-nav { position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: var(--mono); transition: all 0.2s; }
+    .lightbox-close { top: -40px; right: 0; width: 40px; height: 40px; font-size: 1.2rem; }
+    .lightbox-nav { top: 50%; transform: translateY(-50%); width: 44px; height: 44px; font-size: 1.2rem; }
+    .lightbox-prev { left: -60px; }
+    .lightbox-next { right: -60px; }
+    .lightbox-close:hover, .lightbox-nav:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    @media (max-width: 900px) {
+      .photo-header { padding: 130px 24px 40px; }
+      .field-wrap { gap: 60px; }
+      .fr-split, .fr-reverse, .fr-trio { grid-template-columns: 1fr; gap: 12px; }
+      .fr-split .field-photo:last-child, .fr-reverse .field-photo:first-child { margin-top: 0; aspect-ratio: 4/3;}
+      .fr-trio .field-photo:first-child { aspect-ratio: 4/3; }
+      .lightbox-prev { left: 10px; }
+      .lightbox-next { right: 10px; }
+      .lightbox-overlay { padding: 16px; }
+    }
+  </style>
 </head>
 <body>
   <canvas id="space-canvas"></canvas>
@@ -15,44 +127,217 @@
   <site-header></site-header>
 
   <div class="page" style="display:flex; flex-direction:column; min-height:100vh;">
-    <div class="page-header reveal d1">
-      <h1>Galeri</h1>
-      <p>Çalışma anları, donanım projelerinden kareler ve çeşitli anılar.</p>
+
+    <!-- FOTOĞRAFÇI STİLİ ZARİF BAŞLIK -->
+    <div class="photo-header reveal d1">
+      <h1 class="photo-title">Görsel <em>Kayıtlar</em></h1>
+      <p class="photo-desc">Şehirden uzaklaşıp biraz kafa dinlediğim zamanlardan kalanlar. Çok plan yapmadan, sadece anı yakaladığım sıradan ama güzel kareler.</p>
     </div>
+
     <section class="section" style="flex:1;">
-      <div class="section-inner" style="padding-top: 40px;">
-        <div class="gal-grid reveal d2">
-          <!-- 1 - 26 Arası Görseller -->
-          <div class="gi gi-tall"><a href="pictures/gallery/{01}.webp" target="_blank"><img src="pictures/gallery/{01}.webp" alt="Galeri 01"><div class="gi-label">IMG_001</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{02}.webp" target="_blank"><img src="pictures/gallery/{02}.webp" alt="Galeri 02"><div class="gi-label">IMG_002</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{03}.webp" target="_blank"><img src="pictures/gallery/{03}.webp" alt="Galeri 03"><div class="gi-label">IMG_003</div></a></div>
-          <div class="gi gi-wide"><a href="pictures/gallery/{04}.webp" target="_blank"><img src="pictures/gallery/{04}.webp" alt="Galeri 04"><div class="gi-label">IMG_004</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{06}.webp" target="_blank"><img src="pictures/gallery/{06}.webp" alt="Galeri 06"><div class="gi-label">IMG_006</div></a></div>
-          <div class="gi gi-tall"><a href="pictures/gallery/{07}.webp" target="_blank"><img src="pictures/gallery/{07}.webp" alt="Galeri 07"><div class="gi-label">IMG_007</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{08}.webp" target="_blank"><img src="pictures/gallery/{08}.webp" alt="Galeri 08"><div class="gi-label">IMG_008</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{09}.webp" target="_blank"><img src="pictures/gallery/{09}.webp" alt="Galeri 09"><div class="gi-label">IMG_009</div></a></div>
-          <div class="gi gi-wide"><a href="pictures/gallery/{10}.webp" target="_blank"><img src="pictures/gallery/{10}.webp" alt="Galeri 10"><div class="gi-label">IMG_010</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{11}.webp" target="_blank"><img src="pictures/gallery/{11}.webp" alt="Galeri 11"><div class="gi-label">IMG_011</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{12}.webp" target="_blank"><img src="pictures/gallery/{12}.webp" alt="Galeri 12"><div class="gi-label">IMG_012</div></a></div>
-          <div class="gi gi-tall"><a href="pictures/gallery/{13}.webp" target="_blank"><img src="pictures/gallery/{13}.webp" alt="Galeri 13"><div class="gi-label">IMG_013</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{14}.webp" target="_blank"><img src="pictures/gallery/{14}.webp" alt="Galeri 14"><div class="gi-label">IMG_014</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{15}.webp" target="_blank"><img src="pictures/gallery/{15}.webp" alt="Galeri 15"><div class="gi-label">IMG_015</div></a></div>
-          <div class="gi gi-wide"><a href="pictures/gallery/{16}.webp" target="_blank"><img src="pictures/gallery/{16}.webp" alt="Galeri 16"><div class="gi-label">IMG_016</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{17}.webp" target="_blank"><img src="pictures/gallery/{17}.webp" alt="Galeri 17"><div class="gi-label">IMG_017</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{18}.webp" target="_blank"><img src="pictures/gallery/{18}.webp" alt="Galeri 18"><div class="gi-label">IMG_018</div></a></div>
-          <div class="gi gi-tall"><a href="pictures/gallery/{19}.webp" target="_blank"><img src="pictures/gallery/{19}.webp" alt="Galeri 19"><div class="gi-label">IMG_019</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{20}.webp" target="_blank"><img src="pictures/gallery/{20}.webp" alt="Galeri 20"><div class="gi-label">IMG_020</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{21}.webp" target="_blank"><img src="pictures/gallery/{21}.webp" alt="Galeri 21"><div class="gi-label">IMG_021</div></a></div>
-          <div class="gi gi-wide"><a href="pictures/gallery/{22}.webp" target="_blank"><img src="pictures/gallery/{22}.webp" alt="Galeri 22"><div class="gi-label">IMG_022</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{23}.webp" target="_blank"><img src="pictures/gallery/{23}.webp" alt="Galeri 23"><div class="gi-label">IMG_023</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{24}.webp" target="_blank"><img src="pictures/gallery/{24}.webp" alt="Galeri 24"><div class="gi-label">IMG_024</div></a></div>
-          <div class="gi gi-tall"><a href="pictures/gallery/{25}.webp" target="_blank"><img src="pictures/gallery/{25}.webp" alt="Galeri 25"><div class="gi-label">IMG_025</div></a></div>
-          <div class="gi"><a href="pictures/gallery/{26}.webp" target="_blank"><img src="pictures/gallery/{26}.webp" alt="Galeri 26"><div class="gi-label">IMG_026</div></a></div>
+      <div class="section-inner" style="padding-top: 0;">
+        <div class="field-wrap">
+
+          <figure class="field-block field-hero reveal d2">
+            <img src="pictures/gallery/{01}.webp" alt="Manzara 1">
+            <div class="field-hero-frame">KAYIT 01 / 25</div>
+            <figcaption class="field-hero-content">
+              <h2 class="field-hero-title">Yola Çıkarken</h2>
+              <p class="field-hero-sub">Her şeyin geride kaldığı o ilk kilometreler.</p>
+            </figcaption>
+          </figure>
+
+          <div class="field-block fr-split reveal d1">
+            <figure class="field-photo has-caption">
+              <img src="pictures/gallery/{02}.webp" alt="Manzara 2">
+              <span class="fp-frame">02</span>
+              <figcaption>
+                <span class="fp-species">Geniş Açı</span>
+                <span class="fp-meta">Manzara</span>
+              </figcaption>
+            </figure>
+            <figure class="field-photo has-caption">
+              <img src="pictures/gallery/{03}.webp" alt="Manzara 3">
+              <span class="fp-frame">03</span>
+              <figcaption>
+                <span class="fp-species">Kısa Bir Mola</span>
+                <span class="fp-meta">Detay</span>
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="field-block fr-quote reveal">
+            <p>Gidilecek yeri çok düşünmeden, sadece yürümek bazen en iyisi.</p>
+            <cite>Yol Notları</cite>
+          </div>
+
+          <div class="field-block fr-trio reveal d2">
+            <figure class="field-photo has-caption">
+              <img src="pictures/gallery/{04}.webp" alt="Manzara 4">
+              <span class="fp-frame">04</span>
+              <figcaption>
+                <span class="fp-species">Sakinlik</span>
+                <span class="fp-meta">Doğal Doku</span>
+              </figcaption>
+            </figure>
+            <figure class="field-photo">
+              <img src="pictures/gallery/{05}.webp" alt="Manzara 5">
+              <span class="fp-frame">05</span>
+            </figure>
+            <figure class="field-photo has-caption">
+              <img src="pictures/gallery/{06}.webp" alt="Manzara 6">
+              <span class="fp-frame">06</span>
+              <figcaption>
+                <span class="fp-species">Açık Hava</span>
+                <span class="fp-meta">Gözlem</span>
+              </figcaption>
+            </figure>
+          </div>
+
+          <figure class="field-block fr-full field-photo reveal d1">
+            <img src="pictures/gallery/{07}.webp" alt="Manzara 7">
+            <span class="fp-frame">07</span>
+            <figcaption>
+              <span class="fp-species">Ufuk Çizgisi</span>
+              <span class="fp-meta">Panorama</span>
+            </figcaption>
+          </figure>
+
+          <div class="field-block fr-reverse reveal d3">
+            <figure class="field-photo has-caption">
+              <img src="pictures/gallery/{08}.webp" alt="Manzara 8">
+              <span class="fp-frame">08</span>
+              <figcaption>
+                <span class="fp-species">Doğal Kontrast</span>
+                <span class="fp-meta">Işık ve Gölge</span>
+              </figcaption>
+            </figure>
+            <figure class="field-photo has-caption">
+              <img src="pictures/gallery/{09}.webp" alt="Manzara 9">
+              <span class="fp-frame">09</span>
+              <figcaption>
+                <span class="fp-species">Şehirden Uzakta</span>
+                <span class="fp-meta">Sessizlik</span>
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="field-block fr-quote reveal">
+            <p>Bazen en iyi fotoğraf, makineyi çantaya koyup sadece anı izlemektir.</p>
+            <cite>Mola</cite>
+          </div>
+
+          <div class="field-block fr-trio reveal d1">
+            <figure class="field-photo has-caption">
+              <img src="pictures/gallery/{10}.webp" alt="Manzara 10">
+              <span class="fp-frame">10</span>
+              <figcaption>
+                <span class="fp-species">Günün Sonu</span>
+                <span class="fp-meta">Akşamüstü</span>
+              </figcaption>
+            </figure>
+            <figure class="field-photo">
+              <img src="pictures/gallery/{11}.webp" alt="Manzara 11">
+              <span class="fp-frame">11</span>
+            </figure>
+            <figure class="field-photo has-caption">
+              <img src="pictures/gallery/{12}.webp" alt="Manzara 12">
+              <span class="fp-frame">12</span>
+              <figcaption>
+                <span class="fp-species">Dönüş Yolu</span>
+                <span class="fp-meta">Kapanış</span>
+              </figcaption>
+            </figure>
+          </div>
+
         </div>
+
+        <div style="margin-top: 110px;">
+          <div class="field-feed-heading reveal">
+            <h3>Son Eklenenler</h3>
+            <span>Panelden Yüklenen Kareler</span>
+          </div>
+          <div class="field-feed reveal d2">
+          </div>
+        </div>
+
       </div>
     </section>
+
     <site-footer></site-footer>
   </div>
   <script src="js/main.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const overlay = document.createElement('div');
+      overlay.className = 'lightbox-overlay';
+      overlay.innerHTML = `
+        <div class="lightbox-frame">
+          <button class="lightbox-close" aria-label="Kapat" type="button">✕</button>
+          <button class="lightbox-nav lightbox-prev" aria-label="Önceki" type="button">←</button>
+          <img src="" alt="">
+          <div class="lightbox-caption">
+            <div class="lb-species"></div>
+            <div class="lb-meta"></div>
+          </div>
+          <button class="lightbox-nav lightbox-next" aria-label="Sonraki" type="button">→</button>
+        </div>`;
+      document.body.appendChild(overlay);
+
+      const imgEl = overlay.querySelector('img');
+      const speciesEl = overlay.querySelector('.lb-species');
+      const metaEl = overlay.querySelector('.lb-meta');
+      let currentList = [];
+      let currentIndex = 0;
+
+      function openLightbox(index, list) {
+        currentList = list || currentList;
+        if (!currentList.length) return;
+
+        currentIndex = (index + currentList.length) % currentList.length;
+        const fig = currentList[currentIndex];
+        const img = fig.querySelector('img');
+        const species = fig.querySelector('.fp-species');
+        const meta = fig.querySelector('.fp-meta');
+
+        if (!img) return;
+        imgEl.src = img.src;
+        speciesEl.textContent = species ? species.textContent : (img.alt || '');
+        metaEl.textContent = meta ? meta.textContent : '';
+
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      document.addEventListener('click', function(e) {
+        const fig = e.target.closest('.field-photo');
+        if (!fig) return;
+        e.preventDefault();
+        const allFigs = Array.from(document.querySelectorAll('.field-photo'));
+        openLightbox(allFigs.indexOf(fig), allFigs);
+      });
+
+      overlay.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+      overlay.querySelector('.lightbox-prev').addEventListener('click', () => openLightbox(currentIndex - 1));
+      overlay.querySelector('.lightbox-next').addEventListener('click', () => openLightbox(currentIndex + 1));
+
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeLightbox();
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (!overlay.classList.contains('open')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') openLightbox(currentIndex - 1);
+        if (e.key === 'ArrowRight') openLightbox(currentIndex + 1);
+      });
+    });
+  </script>
 </body>
 </html>
