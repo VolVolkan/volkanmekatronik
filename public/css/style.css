@@ -990,3 +990,48 @@ site-footer {
 @media (max-width: 420px) {
   .proj-grid { grid-template-columns: 1fr; } /* Çok küçükse tek kolona düşür */
 }
+
+
+
+
+nav {
+  /* mevcut nav kuralların aynen kalsın, sadece position: relative olduğundan emin ol (zaten fixed var) */
+  overflow: hidden; /* zaten var */
+}
+
+nav::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -12%;
+  width: 10%;
+  height: 100%;
+  background: linear-gradient(
+    118deg,
+    transparent 0%,
+    transparent 30%,
+    color-mix(in srgb, var(--cyan) 60%, transparent) 42%,
+                              rgba(255, 255, 255, 0.95) 50%,
+                              color-mix(in srgb, var(--amber) 55%, transparent) 58%,
+                              transparent 70%,
+                              transparent 100%
+  );
+  box-shadow: 0 0 24px 4px color-mix(in srgb, var(--cyan) 35%, transparent);
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+}
+
+nav.nav-shine::after {
+  animation: navMetalSweep 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) 1 both;
+}
+
+@keyframes navMetalSweep {
+  0%   { transform: translateX(0); opacity: 1; }
+  82%  { opacity: 1; }
+  100% { transform: translateX(1250%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav::after { animation: none !important; display: none; }
+}

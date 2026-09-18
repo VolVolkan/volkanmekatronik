@@ -12,7 +12,7 @@
     const barFill = document.getElementById('preloader-bar-fill');
     const pctNum = document.getElementById('preloader-pct-num');
     const ringFill = document.querySelector('.preloader-ring-fill');
-    const RING_CIRCUMFERENCE = 326.7; // CSS'teki stroke-dasharray değeriyle aynı
+    const RING_CIRCUMFERENCE = 326.7;
 
     let progress = 0;
     let rafId = null;
@@ -24,9 +24,6 @@
       if (ringFill) ringFill.style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - progress / 100));
     }
 
-    // Gerçek yükleme ilerlemesi tarayıcıdan alınamadığı için,
-    // kullanıcıya "bir şeyler oluyor" hissi vermek adına %90'a kadar
-    // yavaşlayarak ilerleyen sahte bir progres kullanıyoruz.
     function tick() {
       if (progress < 90) {
         setProgress(progress + (90 - progress) * 0.05 + 0.4);
@@ -48,10 +45,53 @@
       finish();
     } else {
       window.addEventListener('load', finish);
-      // Güvenlik ağı: herhangi bir kaynak takılırsa 6sn sonra yine de kapat
       setTimeout(finish, 6000);
     }
-  })();
+  })();   // <-- initPreloader burada tam kapanıyor ve çağrılıyor
+
+  /* ══════════════════════════════════════════
+   *  NAV METALİK PARLAMA — TÜM SAYFALARDA ÇALIŞIR
+   * ══════════════════════════════════════════ */
+  (function initNavShine() {
+    let fired = false;
+
+    function fireShine() {
+      if (fired) return;
+      const navEl = document.querySelector('nav');
+      if (!navEl) return;
+      fired = true;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          navEl.classList.add('nav-shine');
+        });
+      });
+    }
+
+    function trigger() {
+      if (document.querySelector('nav')) {
+        fireShine();
+        return;
+      }
+      const observer = new MutationObserver(() => {
+        if (document.querySelector('nav')) {
+          observer.disconnect();
+          fireShine();
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => observer.disconnect(), 5000);
+    }
+
+    function start() {
+      setTimeout(trigger, 700);
+    }
+
+    if (document.readyState === 'complete') {
+      start();
+    } else {
+      window.addEventListener('load', start);
+    }
+  })();   // <-- initNavShine burada kapanıyor ve çağrılıyor
 
   document.addEventListener('DOMContentLoaded', () => {
 
