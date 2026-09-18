@@ -1,885 +1,788 @@
-/* ══════════════════════════════════════════
- *  ÖN YÜKLEME EKRANI (PRELOADER)
- *  HTML/CSS bunu bekliyordu ama hiçbir yerde bu ekranı kapatan kod
- *  yoktu — bu yüzden preloader hiç kapanmıyordu. Sayfa (görseller
- *  dahil) tamamen yüklenince #site-preloader'a "loaded" class'ını
- *  ve body'e "site-ready" class'ını ekliyoruz.
- * ══════════════════════════════════════════ */
-(function initPreloader() {
-  const preloader = document.getElementById('site-preloader');
-  if (!preloader) return;
-
-  const barFill = document.getElementById('preloader-bar-fill');
-  const pctNum = document.getElementById('preloader-pct-num');
-  const ringFill = document.querySelector('.preloader-ring-fill');
-  const RING_CIRCUMFERENCE = 326.7; // CSS'teki stroke-dasharray değeriyle aynı
-
-  let progress = 0;
-  let rafId = null;
-
-  function setProgress(p) {
-    progress = Math.max(progress, Math.min(100, p));
-    if (barFill) barFill.style.width = progress + '%';
-    if (pctNum) pctNum.textContent = Math.round(progress);
-    if (ringFill) ringFill.style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - progress / 100));
-  }
-
-  // Gerçek yükleme ilerlemesi tarayıcıdan alınamadığı için,
-  // kullanıcıya "bir şeyler oluyor" hissi vermek adına %90'a kadar
-  // yavaşlayarak ilerleyen sahte bir progres kullanıyoruz.
-  function tick() {
-    if (progress < 90) {
-      setProgress(progress + (90 - progress) * 0.05 + 0.4);
-      rafId = requestAnimationFrame(tick);
-    }
-  }
-  rafId = requestAnimationFrame(tick);
-
-  function finish() {
-    if (rafId) cancelAnimationFrame(rafId);
-    setProgress(100);
-    setTimeout(() => {
-      preloader.classList.add('loaded');
-      document.body.classList.add('site-ready');
-    }, 250);
-  }
-
-  if (document.readyState === 'complete') {
-    finish();
-  } else {
-    window.addEventListener('load', finish);
-    // Güvenlik ağı: herhangi bir kaynak takılırsa 6sn sonra yine de kapat
-    setTimeout(finish, 6000);
-  }
-})();
-
-document.addEventListener('DOMContentLoaded', () => {
-
-  // Header ve mobil menüdeki anchor (#) linkleri için performanslı JS scroll
-  // NOT: <site-header> içeriği (nav linkleri) custom element tarafından
-  // JS ile sonradan ekleniyor. DOMContentLoaded anında querySelectorAll ile
-  // tek tek listener bağlamak, o içerik henüz DOM'a girmemişse listener'ların
-  // hiç bağlanmamasına (dolayısıyla navigasyonun "bozuk" görünmesine) yol
-  // açabiliyor. Bunun yerine document üzerinde event delegation kullanıyoruz:
-  // link DOM'a ne zaman eklenirse eklensin, tıklama her zaman yakalanır.
-  document.addEventListener('click', function(e) {
-    const link = e.target.closest('a[href*="#"]');
-    if (!link) return;
-
-    const href = link.getAttribute('href');
-    if (!href) return;
-
-    const [pagePath, targetId] = href.split('#');
-
-    const isSamePage = !pagePath ||
-    window.location.pathname.endsWith(pagePath) ||
-    (pagePath === 'index.html' && (window.location.pathname === '/' || window.location.pathname === ''));
-
-    if (isSamePage && targetId) {
-      const targetElement = document.getElementById(targetId);
-
-      if (targetElement) {
-        e.preventDefault();
-
-        targetElement.scrollIntoView({ behavior: 'smooth' });
-
-        const hamburger = document.getElementById('hamburger');
-        const mobileMenu = document.getElementById('mobile-menu');
-        if (hamburger && hamburger.classList.contains('open')) {
-          hamburger.classList.remove('open');
-          mobileMenu.classList.remove('open');
-        }
-      }
-    }
-  });
-
-  /* ══════════════════════════════════
-   *    1. REVEAL ANIMASYONLARI
-   * ══════════════════════════════════ */
-  const io = new IntersectionObserver((entries, observer) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('vis');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-  /* ══════════════════════════════════
-   *    1b. FOOTER ANİMASYONLARI
-   * ══════════════════════════════════ */
-  const footerEl = document.querySelector('footer');
-  if (footerEl) {
-    const footerIO = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        footerEl.style.setProperty('--footer-anim-state', entry.isIntersecting ? 'running' : 'paused');
-        footerEl.classList.toggle('footer-in-view', entry.isIntersecting);
-      });
-    }, { threshold: 0 });
-    footerIO.observe(footerEl);
-  }
-
-  /* ══════════════════════════════════
-   *    2. ÖZEL İMLEÇ & YILDIZ TOZU (STARDUST)
-   * ══════════════════════════════════ */
-  const isFine = window.matchMedia('(pointer: fine)').matches;
-  let stardust = [];
-  let cursorRAF = null;
-  let spaceRAF = null;
-  let scrollDepthRAF = null;
-
-  if (isFine && document.getElementById('cur-wrap')) {
-    const wrap = document.getElementById('cur-wrap');
-    const dot  = document.getElementById('cur-dot');
-    const ring = document.getElementById('cur-ring');
-    const rc   = document.getElementById('cur-ripple-canvas');
-    const rctx = rc.getContext('2d');
-
-    const updateCanvasSize = () => {
-      rc.width  = window.innerWidth;
-      rc.height = window.innerHeight;
-    };
-    updateCanvasSize();
-    window.addEventListener('resize', updateCanvasSize, { passive: true });
-
-    let mx = -200, my = -200, rx = -200, ry = -200, lastMx = -200, lastMy = -200;
-    let isMouseDown = false;
-    const MAX_PARTICLES = 90;
-
-    document.addEventListener('mousemove', e => {
-      lastMx = mx; lastMy = my;
-      mx = e.clientX; my = e.clientY;
-
-      if (stardust.length < MAX_PARTICLES && (Math.abs(mx - lastMx) > 2 || Math.abs(my - lastMy) > 2)) {
-        stardust.push({
-          x: mx + (Math.random() - 0.5) * 10,
-                      y: my + (Math.random() - 0.5) * 10,
-                      size: Math.random() * 2 + 0.5,
-                      life: 1,
-                      decay: Math.random() * 0.03 + 0.015
-        });
-      }
-    }, { passive: true });
-
-    let canvasWasCleared = true;
-
-    (function tick() {
-      if (document.hidden) {
-        cursorRAF = requestAnimationFrame(tick);
-        return;
-      }
-      dot.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%) scale(${isMouseDown ? 0.4 : 1})`;
-
-      rx += (mx - rx) * 0.15;
-      ry += (my - ry) * 0.15;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
-
-      if (stardust.length === 0) {
-        if (!canvasWasCleared) {
-          rctx.clearRect(0, 0, rc.width, rc.height);
-          canvasWasCleared = true;
-        }
-        cursorRAF = requestAnimationFrame(tick);
-        return;
-      }
-
-      rctx.clearRect(0, 0, rc.width, rc.height);
-      canvasWasCleared = false;
-      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
-      const particleColor = wrap.classList.contains('hov')
-      ? (isLightMode ? '184, 113, 10' : '255, 184, 48')
-      : (isLightMode ? '0, 131, 163' : '0, 229, 255');
-
-      for (let i = stardust.length - 1; i >= 0; i--) {
-        const p = stardust[i];
-        p.life -= p.decay;
-        if (p.life <= 0) {
-          stardust.splice(i, 1);
-          continue;
-        }
-        p.y += 0.5;
-        rctx.beginPath();
-        rctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        rctx.fillStyle = `rgba(${particleColor}, ${p.life})`;
-        rctx.fill();
-      }
-
-      cursorRAF = requestAnimationFrame(tick);
-    })();
-
-    const hoverSelectors = 'a, button, .proj-card, .c-card, .gi, .tag, .btn, .theme-toggle';
-    document.body.addEventListener('mouseover', e => {
-      if (e.target.closest('nav')) return;
-      if (e.target.closest(hoverSelectors)) wrap.classList.add('hov');
-    }, { passive: true });
-
-      document.body.addEventListener('mouseout', e => {
-        if (e.target.closest('nav')) return;
-        if (e.target.closest(hoverSelectors)) wrap.classList.remove('hov');
-      }, { passive: true });
-
-        document.addEventListener('mousedown', () => { isMouseDown = true; }, { passive: true });
-        document.addEventListener('mouseup', () => { isMouseDown = false; }, { passive: true });
-  }
-
   /* ══════════════════════════════════════════
-   *    3. STATİK & ESTETİK YILDIZLAR (SPACE CANVAS)
-   * ══════════════════════════════════════════ */
-  const spaceCanvas = document.getElementById('space-canvas');
-  if (spaceCanvas) {
-    const sCtx = spaceCanvas.getContext('2d');
-    let w = spaceCanvas.width = window.innerWidth;
-    let h = spaceCanvas.height = window.innerHeight;
+  *  ÖN YÜKLEME EKRANI (PRELOADER)
+  *  HTML/CSS bunu bekliyordu ama hiçbir yerde bu ekranı kapatan kod
+  *  yoktu — bu yüzden preloader hiç kapanmıyordu. Sayfa (görseller
+  *  dahil) tamamen yüklenince #site-preloader'a "loaded" class'ını
+  *  ve body'e "site-ready" class'ını ekliyoruz.
+  * ══════════════════════════════════════════ */
+  (function initPreloader() {
+    const preloader = document.getElementById('site-preloader');
+    if (!preloader) return;
 
-    const starCount = 100; // Statik olduğu için sayıyı hafif artırdık, daha dolu durur
-    const stars = Array.from({ length: starCount }, () => {
-      const size = Math.random() * 2.5 + 0.5;
-      return {
-        x: Math.random() * w,
-                             y: Math.random() * h,
-                             size: size,
-                             baseAlpha: Math.random() * 0.5 + 0.2,
-                             colorType: Math.random() > 0.85 ? 'amber' : (Math.random() > 0.7 ? 'cyan' : 'white'),
-                             // Sadece belirli boyuttaki yıldızların belli bir kısmı dörtgen olsun (Rastgelelik katıyoruz)
-                             isSparkle: size > 1.5 && Math.random() > 0.65
-      };
-    });
+    const barFill = document.getElementById('preloader-bar-fill');
+    const pctNum = document.getElementById('preloader-pct-num');
+    const ringFill = document.querySelector('.preloader-ring-fill');
+    const RING_CIRCUMFERENCE = 326.7; // CSS'teki stroke-dasharray değeriyle aynı
 
-    const bgCanvas = document.createElement('canvas');
-    const bgCtx = bgCanvas.getContext('2d');
+    let progress = 0;
+    let rafId = null;
 
-    function drawBackgroundLayer() {
-      bgCanvas.width = w;
-      bgCanvas.height = h;
-      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
-      const bgGrad = bgCtx.createRadialGradient(
-        w * 0.5, h * 0.3, 50,
-        w * 0.5, h * 0.5, Math.max(w, h)
-      );
-      if (isLightMode) { bgGrad.addColorStop(0, '#f8fafc'); bgGrad.addColorStop(1, '#e2e8f0'); }
-      else { bgGrad.addColorStop(0, '#090e17'); bgGrad.addColorStop(0.5, '#05070a'); bgGrad.addColorStop(1, '#020305'); }
-      bgCtx.fillStyle = bgGrad;
-      bgCtx.fillRect(0, 0, w, h);
+    function setProgress(p) {
+      progress = Math.max(progress, Math.min(100, p));
+      if (barFill) barFill.style.width = progress + '%';
+      if (pctNum) pctNum.textContent = Math.round(progress);
+      if (ringFill) ringFill.style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - progress / 100));
     }
 
-    // Estetik 4 Köşeli Yıldız Çizici (Daha sivri, zarif uçlar)
-    function drawFourPointStar(ctx, cx, cy, outerRadius, innerRadius, color) {
-      let rot = (Math.PI / 2) * 3;
-      let x = cx;
-      let y = cy;
-      const step = Math.PI / 4;
-
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - outerRadius);
-      for (let i = 0; i < 4; i++) {
-        x = cx + Math.cos(rot) * outerRadius;
-        y = cy + Math.sin(rot) * outerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
-
-        x = cx + Math.cos(rot) * innerRadius;
-        y = cy + Math.sin(rot) * innerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
+    // Gerçek yükleme ilerlemesi tarayıcıdan alınamadığı için,
+    // kullanıcıya "bir şeyler oluyor" hissi vermek adına %90'a kadar
+    // yavaşlayarak ilerleyen sahte bir progres kullanıyoruz.
+    function tick() {
+      if (progress < 90) {
+        setProgress(progress + (90 - progress) * 0.05 + 0.4);
+        rafId = requestAnimationFrame(tick);
       }
-      ctx.lineTo(cx, cy - outerRadius);
-      ctx.closePath();
-      ctx.fillStyle = color;
-      ctx.fill();
+    }
+    rafId = requestAnimationFrame(tick);
+
+    function finish() {
+      if (rafId) cancelAnimationFrame(rafId);
+      setProgress(100);
+      setTimeout(() => {
+        preloader.classList.add('loaded');
+        document.body.classList.add('site-ready');
+      }, 250);
     }
 
-    // Statik Çizim Fonksiyonu
-    function renderStaticSpace() {
-      drawBackgroundLayer();
-      sCtx.clearRect(0, 0, w, h);
-      sCtx.drawImage(bgCanvas, 0, 0);
+    if (document.readyState === 'complete') {
+      finish();
+    } else {
+      window.addEventListener('load', finish);
+      // Güvenlik ağı: herhangi bir kaynak takılırsa 6sn sonra yine de kapat
+      setTimeout(finish, 6000);
+    }
+  })();
 
-      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
+  document.addEventListener('DOMContentLoaded', () => {
 
-      stars.forEach(star => {
-        const currentAlpha = Math.min(star.baseAlpha + 0.2, 0.9);
+    // Header ve mobil menüdeki anchor (#) linkleri için performanslı JS scroll
+    // NOT: <site-header> içeriği (nav linkleri) custom element tarafından
+    // JS ile sonradan ekleniyor. DOMContentLoaded anında querySelectorAll ile
+    // tek tek listener bağlamak, o içerik henüz DOM'a girmemişse listener'ların
+    // hiç bağlanmamasına (dolayısıyla navigasyonun "bozuk" görünmesine) yol
+    // açabiliyor. Bunun yerine document üzerinde event delegation kullanıyoruz:
+    // link DOM'a ne zaman eklenirse eklensin, tıklama her zaman yakalanır.
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a[href*="#"]');
+      if (!link) return;
 
-        let rgbCol = isLightMode ? '15, 23, 42' : '255, 255, 255';
-        let hexShadow = isLightMode ? '#0f172a' : '#ffffff';
+      const href = link.getAttribute('href');
+      if (!href) return;
 
-        if (star.colorType === 'cyan') {
-          rgbCol = isLightMode ? '0, 131, 163' : '0, 229, 255';
-          hexShadow = isLightMode ? '#0083a3' : '#00e5ff'; // Işıma (Bloom) için hex renkleri
-        }
-        if (star.colorType === 'amber') {
-          rgbCol = isLightMode ? '184, 113, 10' : '255, 184, 48';
-          hexShadow = isLightMode ? '#b8710a' : '#ffb830';
-        }
+      const [pagePath, targetId] = href.split('#');
 
-        const starColor = `rgba(${rgbCol}, ${currentAlpha})`;
+      const isSamePage = !pagePath ||
+      window.location.pathname.endsWith(pagePath) ||
+      (pagePath === 'index.html' && (window.location.pathname === '/' || window.location.pathname === ''));
 
-        // Sadece seçilmiş (isSparkle) yıldızları dörtgen yap
-        if (star.isSparkle) {
-          const outerR = star.size * 3.5; // Çok daha belirgin ve uzun dış uçlar
-          const innerR = star.size * 0.15; // Çok ince iç kısımlar (zarif lens parlaması görünümü)
+      if (isSamePage && targetId) {
+        const targetElement = document.getElementById(targetId);
 
-      sCtx.save(); // Diğer yıldızları etkilememesi için save()
+        if (targetElement) {
+          e.preventDefault();
 
-      if (!isLightMode) {
-        // Statik canvas'ın nimetlerinden faydalanıp gerçek ışıma efekti ekliyoruz
-        sCtx.shadowBlur = outerR * 2.5;
-        sCtx.shadowColor = hexShadow;
-      }
+          targetElement.scrollIntoView({ behavior: 'smooth' });
 
-      // Yıldızın kendi şekli
-      drawFourPointStar(sCtx, star.x, star.y, outerR, innerR, starColor);
-
-      // Merkeze parlak beyaz/açık renk bir çekirdek (daha gerçekçi durur)
-      sCtx.beginPath();
-      sCtx.arc(star.x, star.y, innerR * 1.5, 0, Math.PI * 2);
-      sCtx.fillStyle = `rgba(255, 255, 255, ${currentAlpha + 0.2})`;
-      sCtx.fill();
-
-      sCtx.restore(); // Shadow efektini sadece bu yıldıza hapsediyoruz
-
-        } else {
-          // Normal yıldızlar dairesel nokta kalır
-          sCtx.beginPath();
-          sCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-          sCtx.fillStyle = starColor;
-          sCtx.fill();
-
-          // Hafif büyük ama dörtgen olmayan normal daire yıldızlara ufak bir aura
-          if (star.size > 1.8 && !isLightMode) {
-            sCtx.beginPath();
-            sCtx.arc(star.x, star.y, star.size * 2.5, 0, Math.PI * 2);
-            sCtx.fillStyle = `rgba(${rgbCol}, 0.15)`;
-            sCtx.fill();
+          const hamburger = document.getElementById('hamburger');
+          const mobileMenu = document.getElementById('mobile-menu');
+          if (hamburger && hamburger.classList.contains('open')) {
+            hamburger.classList.remove('open');
+            mobileMenu.classList.remove('open');
           }
         }
+      }
+    });
+
+    /* ══════════════════════════════════
+    *    1. REVEAL ANIMASYONLARI
+    * ══════════════════════════════════ */
+    const io = new IntersectionObserver((entries, observer) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('vis');
+          observer.unobserve(e.target);
+        }
       });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    /* ══════════════════════════════════
+    *    1b. FOOTER ANİMASYONLARI
+    * ══════════════════════════════════ */
+    const footerEl = document.querySelector('footer');
+    if (footerEl) {
+      const footerIO = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          footerEl.style.setProperty('--footer-anim-state', entry.isIntersecting ? 'running' : 'paused');
+          footerEl.classList.toggle('footer-in-view', entry.isIntersecting);
+        });
+      }, { threshold: 0 });
+      footerIO.observe(footerEl);
     }
 
-    // İlk çizim
-    renderStaticSpace();
 
-    // Sadece ekran boyutu değişirse tekrar çiz
-    window.addEventListener('resize', () => {
-      w = spaceCanvas.width = window.innerWidth;
-      h = spaceCanvas.height = window.innerHeight;
+    /* ══════════════════════════════════════════
+    *    3. STATİK & ESTETİK YILDIZLAR (SPACE CANVAS)
+    * ══════════════════════════════════════════ */
+    const spaceCanvas = document.getElementById('space-canvas');
+    if (spaceCanvas) {
+      const sCtx = spaceCanvas.getContext('2d');
+      let w = spaceCanvas.width = window.innerWidth;
+      let h = spaceCanvas.height = window.innerHeight;
+
+      const starCount = 100; // Statik olduğu için sayıyı hafif artırdık, daha dolu durur
+      const stars = Array.from({ length: starCount }, () => {
+        const size = Math.random() * 2.5 + 0.5;
+        return {
+          x: Math.random() * w,
+              y: Math.random() * h,
+              size: size,
+              baseAlpha: Math.random() * 0.5 + 0.2,
+              colorType: Math.random() > 0.85 ? 'amber' : (Math.random() > 0.7 ? 'cyan' : 'white'),
+              // Sadece belirli boyuttaki yıldızların belli bir kısmı dörtgen olsun (Rastgelelik katıyoruz)
+              isSparkle: size > 1.3 && Math.random() > 0.42      };
+      });
+
+      const bgCanvas = document.createElement('canvas');
+      const bgCtx = bgCanvas.getContext('2d');
+
+      function drawBackgroundLayer() {
+        bgCanvas.width = w;
+        bgCanvas.height = h;
+        const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
+        const bgGrad = bgCtx.createRadialGradient(
+          w * 0.5, h * 0.3, 50,
+          w * 0.5, h * 0.5, Math.max(w, h)
+        );
+        if (isLightMode) { bgGrad.addColorStop(0, '#f8fafc'); bgGrad.addColorStop(1, '#e2e8f0'); }
+        else { bgGrad.addColorStop(0, '#090e17'); bgGrad.addColorStop(0.5, '#05070a'); bgGrad.addColorStop(1, '#020305'); }
+        bgCtx.fillStyle = bgGrad;
+        bgCtx.fillRect(0, 0, w, h);
+      }
+
+      // Estetik 4 Köşeli Yıldız Çizici (Daha sivri, zarif uçlar)
+      function drawFourPointStar(ctx, cx, cy, outerRadius, innerRadius, color) {
+        let rot = (Math.PI / 2) * 3;
+        let x = cx;
+        let y = cy;
+        const step = Math.PI / 4;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - outerRadius);
+        for (let i = 0; i < 4; i++) {
+          x = cx + Math.cos(rot) * outerRadius;
+          y = cy + Math.sin(rot) * outerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+
+          x = cx + Math.cos(rot) * innerRadius;
+          y = cy + Math.sin(rot) * innerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+        }
+        ctx.lineTo(cx, cy - outerRadius);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+
+      // Statik Çizim Fonksiyonu
+      function renderStaticSpace() {
+        drawBackgroundLayer();
+        sCtx.clearRect(0, 0, w, h);
+        sCtx.drawImage(bgCanvas, 0, 0);
+
+        const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
+
+        stars.forEach(star => {
+          const currentAlpha = Math.min(star.baseAlpha + 0.25, 0.95);
+
+          let rgbCol = isLightMode ? '15, 23, 42' : '255, 255, 255';
+          let hexShadow = isLightMode ? '#0f172a' : '#ffffff';
+
+          if (star.colorType === 'cyan') {
+            rgbCol = isLightMode ? '0, 131, 163' : '0, 229, 255';
+            hexShadow = isLightMode ? '#0083a3' : '#00e5ff'; // Işıma (Bloom) için hex renkleri
+          }
+          if (star.colorType === 'amber') {
+            rgbCol = isLightMode ? '184, 113, 10' : '255, 184, 48';
+            hexShadow = isLightMode ? '#b8710a' : '#ffb830';
+          }
+
+          const starColor = `rgba(${rgbCol}, ${currentAlpha})`;
+
+          // Sadece seçilmiş (isSparkle) yıldızları dörtgen yap
+          if (star.isSparkle) {
+            const outerR = star.size * 4.0;
+            const innerR = star.size * 0.50;
+        sCtx.save(); // Diğer yıldızları etkilememesi için save()
+
+        if (!isLightMode) {
+          // Statik canvas'ın nimetlerinden faydalanıp gerçek ışıma efekti ekliyoruz
+          sCtx.shadowBlur = outerR * 2.5;
+          sCtx.shadowColor = hexShadow;
+        }
+
+        // Yıldızın kendi şekli
+        drawFourPointStar(sCtx, star.x, star.y, outerR, innerR, starColor);
+
+        // Merkeze parlak beyaz/açık renk bir çekirdek (daha gerçekçi durur)
+        sCtx.beginPath();
+        sCtx.arc(star.x, star.y, innerR * 1.5, 0, Math.PI * 2);
+        sCtx.fillStyle = `rgba(255, 255, 255, ${currentAlpha + 0.2})`;
+        sCtx.fill();
+
+        sCtx.restore(); // Shadow efektini sadece bu yıldıza hapsediyoruz
+
+          } else {
+            // Normal yıldızlar dairesel nokta kalır
+            sCtx.beginPath();
+            sCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            sCtx.fillStyle = starColor;
+            sCtx.fill();
+
+            // Hafif büyük ama dörtgen olmayan normal daire yıldızlara ufak bir aura
+            if (star.size > 1.8 && !isLightMode) {
+              sCtx.beginPath();
+              sCtx.arc(star.x, star.y, star.size * 2.5, 0, Math.PI * 2);
+              sCtx.fillStyle = `rgba(${rgbCol}, 0.15)`;
+              sCtx.fill();
+            }
+          }
+        });
+      }
+
+      // İlk çizim
       renderStaticSpace();
+
+      // Debounce ile ekran boyutu değişimi
+      let spaceResizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(spaceResizeTimeout);
+        spaceResizeTimeout = setTimeout(() => {
+          w = spaceCanvas.width = window.innerWidth;
+          h = spaceCanvas.height = window.innerHeight;
+          renderStaticSpace();
+        }, 250); // Kaydırma bitince 250ms sonra 1 kez çizer
+      }, { passive: true });
+      }
+
+    /* ══════════════════════════════════════════
+    *    4. SCROLL DEPTH / PARALLAX
+    * ══════════════════════════════════════════ */
+    const progressBar = document.querySelector('.scroll-progress span');
+    const sideStars = document.querySelectorAll('.side-stars');
+    const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let targetScroll = window.scrollY;
+    let visualScroll = window.scrollY;
+    let maxScroll = 1;
+    let windowHeight = window.innerHeight;
+
+    let sectionsData = [];
+    function cacheSectionMetrics() {
+      windowHeight = window.innerHeight;
+      const doc = document.documentElement;
+      maxScroll = Math.max(1, doc.scrollHeight - windowHeight);
+
+      sectionsData = Array.from(document.querySelectorAll('.section')).map(el => ({
+        el,
+        centerTop: el.offsetTop + el.offsetHeight / 2
+      }));
+    }
+
+    cacheSectionMetrics();
+    let scrollMetricsTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(scrollMetricsTimeout);
+      scrollMetricsTimeout = setTimeout(cacheSectionMetrics, 250);
     }, { passive: true });
-  }
-
-  /* ══════════════════════════════════════════
-   *    4. SCROLL DEPTH / PARALLAX
-   * ══════════════════════════════════════════ */
-  const progressBar = document.querySelector('.scroll-progress span');
-  const sideStars = document.querySelectorAll('.side-stars');
-  const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  let targetScroll = window.scrollY;
-  let visualScroll = window.scrollY;
-  let maxScroll = 1;
-  let windowHeight = window.innerHeight;
-
-  let sectionsData = [];
-  function cacheSectionMetrics() {
-    windowHeight = window.innerHeight;
-    const doc = document.documentElement;
-    maxScroll = Math.max(1, doc.scrollHeight - windowHeight);
-
-    sectionsData = Array.from(document.querySelectorAll('.section')).map(el => ({
-      el,
-      centerTop: el.offsetTop + el.offsetHeight / 2
-    }));
-  }
-
-  cacheSectionMetrics();
-  window.addEventListener('resize', cacheSectionMetrics, { passive: true });
-
-  function updateScrollMotion() {
-    const newScroll = window.scrollY;
-    if (Math.abs(newScroll - targetScroll) > 250) {
-      visualScroll = newScroll;
-    }
-    targetScroll = newScroll;
-    const progress = Math.min(1, Math.max(0, targetScroll / maxScroll));
-    if (progressBar) progressBar.style.height = (progress * 100) + '%';
-  }
-
-  window.addEventListener('scroll', updateScrollMotion, { passive: true });
-  updateScrollMotion();
-
-  if (motionOK) {
-    let scrollDepthRunning = false;
-
-    function animateScrollDepth() {
-      visualScroll += (targetScroll - visualScroll) * 0.075;
-
-      for (let i = 0; i < sectionsData.length; i++) {
-        const sec = sectionsData[i];
-        const distance = (sec.centerTop - visualScroll) - windowHeight / 2;
-        const shift = Math.max(-14, Math.min(14, -distance * 0.012));
-        sec.el.style.transform = `translate3d(0, ${shift}px, 0)`;
+    function updateScrollMotion() {
+      const newScroll = window.scrollY;
+      if (Math.abs(newScroll - targetScroll) > 250) {
+        visualScroll = newScroll;
       }
-
-      sideStars.forEach((rail, index) => {
-        const drift = visualScroll * (index === 0 ? 0.055 : -0.045);
-        rail.style.transform = `translate3d(0, ${drift}px, 0)`;
-      });
-
-      if (Math.abs(targetScroll - visualScroll) < 0.3) {
-        visualScroll = targetScroll;
-        scrollDepthRunning = false;
-        for (let i = 0; i < sectionsData.length; i++) sectionsData[i].el.style.willChange = 'auto';
-        return;
-      }
-      scrollDepthRAF = requestAnimationFrame(animateScrollDepth);
+      targetScroll = newScroll;
+      const progress = Math.min(1, Math.max(0, targetScroll / maxScroll));
+      if (progressBar) progressBar.style.height = (progress * 100) + '%';
     }
 
-    function ensureScrollDepthRunning() {
-      if (!scrollDepthRunning) {
-        scrollDepthRunning = true;
-        for (let i = 0; i < sectionsData.length; i++) sectionsData[i].el.style.willChange = 'transform';
+    window.addEventListener('scroll', updateScrollMotion, { passive: true });
+    updateScrollMotion();
+
+    if (motionOK) {
+      let scrollDepthRunning = false;
+
+      function animateScrollDepth() {
+        visualScroll += (targetScroll - visualScroll) * 0.075;
+
+        for (let i = 0; i < sectionsData.length; i++) {
+          const sec = sectionsData[i];
+          const distance = (sec.centerTop - visualScroll) - windowHeight / 2;
+          const shift = Math.max(-14, Math.min(14, -distance * 0.012));
+          sec.el.style.transform = `translate3d(0, ${shift}px, 0)`;
+        }
+
+        sideStars.forEach((rail, index) => {
+          const drift = visualScroll * (index === 0 ? 0.055 : -0.045);
+          rail.style.setProperty('--drift-y', drift + 'px');
+        });
+
+        if (Math.abs(targetScroll - visualScroll) < 0.3) {
+          visualScroll = targetScroll;
+          scrollDepthRunning = false;
+          for (let i = 0; i < sectionsData.length; i++) sectionsData[i].el.style.willChange = 'auto';
+          return;
+        }
         scrollDepthRAF = requestAnimationFrame(animateScrollDepth);
       }
+
+      function ensureScrollDepthRunning() {
+        if (!scrollDepthRunning) {
+          scrollDepthRunning = true;
+          for (let i = 0; i < sectionsData.length; i++) sectionsData[i].el.style.willChange = 'transform';
+          scrollDepthRAF = requestAnimationFrame(animateScrollDepth);
+        }
+      }
+
+      window.addEventListener('scroll', ensureScrollDepthRunning, { passive: true });
+      ensureScrollDepthRunning();
     }
 
-    window.addEventListener('scroll', ensureScrollDepthRunning, { passive: true });
-    ensureScrollDepthRunning();
-  }
+    /* ══════════════════════════════════════════
+    *    5. SAYFADAN ÇIKARKEN ANİMASYONLARI ANINDA DURDUR
+    * ══════════════════════════════════════════ */
+    function stopAllLoops() {
+      if (cursorRAF) cancelAnimationFrame(cursorRAF);
+      if (spaceRAF) cancelAnimationFrame(spaceRAF);
+      if (scrollDepthRAF) cancelAnimationFrame(scrollDepthRAF);
+    }
+
+    document.addEventListener('click', e => {
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href || link.target === '_blank') return;
+      if (/^(mailto:|tel:|javascript:)/i.test(href)) return;
+
+      const normalize = p => p.replace(/\/index\.html$/i, '/').replace(/\/+$/, '') || '/';
+      if (link.host === location.host && normalize(link.pathname) === normalize(location.pathname)) {
+        return;
+      }
+      stopAllLoops();
+    }, { capture: true });
+
+    window.addEventListener('pagehide', stopAllLoops);
+  });
 
   /* ══════════════════════════════════════════
-   *    5. SAYFADAN ÇIKARKEN ANİMASYONLARI ANINDA DURDUR
-   * ══════════════════════════════════════════ */
-  function stopAllLoops() {
-    if (cursorRAF) cancelAnimationFrame(cursorRAF);
-    if (spaceRAF) cancelAnimationFrame(spaceRAF);
-    if (scrollDepthRAF) cancelAnimationFrame(scrollDepthRAF);
+  * 5. ÇEVİRİ SÖZLÜĞÜ (i18n)
+  * ══════════════════════════════════════════ */
+  const dict = {
+    tr: {
+      nav_chip: "MKT · ENG",
+      nav_home: "Anasayfa",
+      nav_about: "Hakkımda",
+      nav_projects: "Projeler",
+      nav_gallery: "Galeri",
+      nav_blog: "Blog",
+      nav_contact: "İletişim",
+      hero_status: "Hoşgeldiniz &nbsp;—&nbsp; MEKATRONİK MÜHENDİSİ",
+      hero_desc: "Teknolojinin yalnızca nasıl çalıştığını değil, nasıl bir sisteme dönüştürülebileceğini anlamaya odaklanıyorum. Devrelerden yazılıma, otomasyondan sistem entegrasyonuna kadar farklı disiplinleri bir araya getirerek teknik çözümleri yönetilebilir ve sürdürülebilir yapılara dönüştürüyorum. Eskişehir merkezli yürütmeyi hedeflediğim mühendislik vizyonumla; doğru teknolojiyi seçmek, doğru kaynakları bir araya getirmek ve ölçülebilir sonuçlar üretmek üzerine çalışıyorum.",
+      hero_btn1: "Projeleri İncele",
+      hero_btn2: "İletişim Kur &rarr;",
+      about_label: "01 / Hakkımda",
+      about_title: "Nasıl <em>Biri?</em>",
+      about_p1: "Küçüklüğümden beri bir şeylerin nasıl çalıştığına dair merakım hiç bitmedi. Bir sistemi oluşturan parçaların nasıl bir araya geldiğini anlamak ve onları birlikte çalışırken görmek her zaman ilgimi çekti. Mekatronik mühendisliği de bu merakın doğal karşılığı oldu — elektronik, mekanik ve yazılımın kesişiminde çalışmak bana hem mantıklı hem de doğal geliyor. Zamanla bu merak, yalnızca sistemleri anlamaktan çok, onları bir bütün olarak düşünmeye ve ortaya çıkan sonucu yönetmeye dönüştü.",
+      about_p2: "<p>Multidisipliner bir yaklaşımla; gömülü sistemler, donanım tasarımı ve yazılım geliştirme alanlarını uçtan uca entegre eden sistem odaklı bir mühendisim.</p><ul class='about-highlights'><li><strong>Yazılım &amp; Sistemler:</strong> C ve Python odaklı mimariler, ileri seviye Linux ekosistemi ve Selenium otomasyonları.</li><li><strong>Gömülü &amp; Tasarım:</strong> KiCad ile PCB tasarımı, SolidWorks ile mekanik modelleme, gömülü C programlama, Arduino ve Raspberry Pi mimarileri.</li><li><strong>Sistem Entegrasyonu:</strong> Münferit teknolojileri tek başına kullanmak yerine; donanım, gömülü yazılım ve otomasyon katmanlarını ihtiyaca uygun şekilde bir araya getirerek uçtan uca çalışan çözümler üretme yaklaşımı.</li><li><strong>Dil Yeterlilikleri:</strong> Türkçe (Ana Dil), İngilizce (Aktif / İş Düzeyi), Almanca (Öğrenim Aşamasında).</li></ul>",
+      proj_sec_label: "02 / Projeler (Özet)",
+      proj_sec_title: "Öne Çıkan <em>Çalışmalar</em>",
+      proj_cta: "PDF Raporunu Gör",
+      proj_all_btn: "Tüm Projeleri Gör &rarr;",
+      gal_sec_label: "03 / Galeri (Özet)",
+      gal_sec_title: "Anlık <em>Kareler</em>",
+      gal_all: "Tümünü Gör",
+      gal_all_btn: "Galerinin Tamamına Git &rarr;",
+      contact_label: "05 / İletişim",
+      contact_title: "Bağlantı <em>Kurun</em>",
+      contact_lead: "Eskişehir veya Türkiye genelinde mühendislik projeleri, teknik sorular veya iş birlikleri için aşağıdaki kanallardan ulaşabilirsiniz.",
+      c_note: "// Sesli aramaya her zaman hazır olmayabilirim",
+      footer_copy: "© 2026 Volkan Tuncer — Karabük Üniversitesi · Mekatronik Mühendisliği",
+      footer_sys: "sistem aktif"
+    },
+    en: {
+      nav_chip: "MCH · ENG",
+      nav_home: "Home",
+      nav_about: "About",
+      nav_projects: "Projects",
+      nav_gallery: "Gallery",
+      nav_blog: "Blog",
+      nav_contact: "Contact",
+      hero_status: "Welcome &nbsp;—&nbsp; MECHATRONICS ENGINEER",
+      hero_desc: "I focus on understanding not just how technology works, but how it can be turned into a complete system. By bringing together disciplines from circuits to software, from automation to system integration, I turn technical solutions into manageable, sustainable structures. With an engineering vision centered in Eskişehir, I work on choosing the right technology, bringing together the right resources, and producing measurable results.",
+      hero_btn1: "View Projects",
+      hero_btn2: "Get in Touch &rarr;",
+      about_label: "01 / About Me",
+      about_title: "Who am <em>I?</em>",
+      about_p1: "My curiosity about how things work has never faded since childhood. Understanding how the parts that make up a system come together, and seeing them work in harmony, has always fascinated me. Mechatronics engineering became the natural answer to that curiosity — working at the intersection of electronics, mechanics, and software feels both logical and natural to me. Over time, this curiosity evolved from simply understanding systems into thinking of them as a whole and managing the outcome.",
+      about_p2: "<p>With a multidisciplinary approach, I am a systems-focused engineer who integrates embedded systems, hardware design, and software development end to end.</p><ul class='about-highlights'><li><strong>Software &amp; Systems:</strong> C and Python-focused architectures, an advanced Linux ecosystem, and Selenium automation.</li><li><strong>Embedded &amp; Design:</strong> PCB design with KiCad, mechanical modeling with SolidWorks, embedded C programming, and Arduino / Raspberry Pi architectures.</li><li><strong>System Integration:</strong> Rather than using individual technologies in isolation, an approach that brings together hardware, embedded software, and automation layers as needed to produce end-to-end working solutions.</li><li><strong>Language Skills:</strong> Turkish (Native), English (Active / Working Proficiency), German (Currently Learning).</li></ul>",
+      proj_sec_label: "02 / Projects (Summary)",
+      proj_sec_title: "Featured <em>Works</em>",
+      proj_cta: "View PDF Report",
+      proj_all_btn: "View All Projects &rarr;",
+      gal_sec_label: "03 / Gallery (Summary)",
+      gal_sec_title: "Instant <em>Frames</em>",
+      gal_all: "View All",
+      gal_all_btn: "Go to Full Gallery &rarr;",
+      contact_label: "05 / Contact",
+      contact_title: "Establish <em>Connection</em>",
+      contact_lead: "You can reach me through the channels below for engineering projects, technical questions, or collaborations across Eskişehir or Turkey.",
+      c_note: "// I may not always be available for voice calls",
+      footer_copy: "© 2026 Volkan Tuncer — Karabuk University · Mechatronics Engineering",
+      footer_sys: "system active"
+    },
+    de: {
+      nav_chip: "MCH · ING",
+      nav_home: "Startseite",
+      nav_about: "Über mich",
+      nav_projects: "Projekte",
+      nav_gallery: "Galerie",
+      nav_blog: "Blog",
+      nav_contact: "Kontakt",
+      hero_status: "Willkommen &nbsp;—&nbsp; MECHATRONIK-INGENIEUR",
+      hero_desc: "Ich konzentriere mich darauf, nicht nur zu verstehen, wie Technologie funktioniert, sondern wie sie in ein vollständiges System verwandelt werden kann. Indem ich Disziplinen von Schaltkreisen bis Software, von Automatisierung bis Systemintegration zusammenbringe, verwandle ich technische Lösungen in handhabbare und nachhaltige Strukturen. Mit einer ingenieurtechnischen Vision mit Schwerpunkt Eskişehir arbeite ich daran, die richtige Technologie auszuwählen, die richtigen Ressourcen zusammenzubringen und messbare Ergebnisse zu erzielen.",
+      hero_btn1: "Projekte Ansehen",
+      hero_btn2: "Kontakt Aufnehmen &rarr;",
+      about_label: "01 / Über mich",
+      about_title: "Wer bin <em>ich?</em>",
+      about_p1: "Meine Neugier, wie Dinge funktionieren, ist seit meiner Kindheit nie erloschen. Zu verstehen, wie die Teile eines Systems zusammenkommen, und zu sehen, wie sie gemeinsam funktionieren, hat mich immer fasziniert. Mechatronik-Ingenieurwesen wurde die natürliche Antwort auf diese Neugier — an der Schnittstelle von Elektronik, Mechanik und Software zu arbeiten fühlt sich für mich logisch und natürlich an. Mit der Zeit entwickelte sich diese Neugier vom bloßen Verstehen von Systemen zu einem ganzheitlichen Denken und der Steuerung des Ergebnisses.",
+      about_p2: "<p>Mit einem multidisziplinären Ansatz bin ich ein systemorientierter Ingenieur, der eingebettete Systeme, Hardwaredesign und Softwareentwicklung durchgängig integriert.</p><ul class='about-highlights'><li><strong>Software &amp; Systeme:</strong> C- und Python-orientierte Architekturen, ein fortgeschrittenes Linux-Ökosystem und Selenium-Automatisierungen.</li><li><strong>Embedded &amp; Design:</strong> PCB-Design mit KiCad, mechanische Modellierung mit SolidWorks, eingebettete C-Programmierung sowie Arduino- und Raspberry-Pi-Architekturen.</li><li><strong>Systemintegration:</strong> Statt einzelne Technologien isoliert einzusetzen, ein Ansatz, der Hardware-, Embedded-Software- und Automatisierungsebenen bedarfsgerecht zusammenführt, um durchgängig funktionierende Lösungen zu schaffen.</li><li><strong>Sprachkenntnisse:</strong> Türkisch (Muttersprache), Englisch (Aktiv / Berufliches Niveau), Deutsch (In Ausbildung).</li></ul>",
+      proj_sec_label: "02 / Projekte (Zusammenfassung)",
+      proj_sec_title: "Ausgewählte <em>Arbeiten</em>",
+      proj_cta: "PDF-Bericht Ansehen",
+      proj_all_btn: "Alle Projekte Ansehen &rarr;",
+      gal_sec_label: "03 / Galerie (Zusammenfassung)",
+      gal_sec_title: "Momentaufnahmen",
+      gal_all: "Alle Ansehen",
+      gal_all_btn: "Zur Vollständigen Galerie &rarr;",
+      contact_label: "05 / Kontakt",
+      contact_title: "Verbindung <em>Herstellen</em>",
+      contact_lead: "Für Ingenieurprojekte, technische Fragen oder Kooperationen in Eskişehir oder in ganz Türkei erreichen Sie mich über die folgenden Kanäle.",
+      c_note: "// Für Telefonanrufe bin ich möglicherweise nicht immer erreichbar",
+      footer_copy: "© 2026 Volkan Tuncer — Universität Karabuk · Mechatronik",
+      footer_sys: "system aktiv"
+    },
+    zh: {
+      nav_chip: "机电 · 工程",
+      nav_home: "主页",
+      nav_about: "关于我",
+      nav_projects: "项目",
+      nav_gallery: "画廊",
+      nav_blog: "博客",
+      nav_contact: "联系",
+      hero_status: "欢迎 &nbsp;—&nbsp; 机电工程师",
+      hero_desc: "我关注的不仅是技术如何运作，更是它如何转化为一个完整的系统。通过将电路、软件、自动化和系统集成等不同学科结合起来，我将技术方案转化为可管理、可持续的结构。以埃斯基谢希尔为中心的工程愿景为基础，我致力于选择合适的技术、整合合适的资源，并产出可衡量的成果。",
+      hero_btn1: "查看项目",
+      hero_btn2: "取得联系 &rarr;",
+      about_label: "01 / 关于我",
+      about_title: "我是 <em>谁？</em>",
+      about_p1: "从小到大，我对事物运作原理的好奇心从未停止。理解一个系统的各个部件如何组合在一起，并看着它们协同运作，一直深深吸引着我。机电工程正是这种好奇心的自然归宿——在电子、机械和软件的交汇处工作，对我来说既合乎逻辑又十分自然。随着时间的推移，这种好奇心逐渐从单纯理解系统，发展为将其视为一个整体进行思考，并掌控最终成果。",
+      about_p2: "<p>凭借跨学科的方法，我是一名以系统为核心的工程师，能够端到端地整合嵌入式系统、硬件设计与软件开发。</p><ul class='about-highlights'><li><strong>软件与系统：</strong>以 C 和 Python 为核心的架构、高级 Linux 生态系统以及 Selenium 自动化。</li><li><strong>嵌入式与设计：</strong>使用 KiCad 进行 PCB 设计，使用 SolidWorks 进行机械建模，嵌入式 C 编程，以及 Arduino 和 Raspberry Pi 架构。</li><li><strong>系统集成：</strong>不是孤立地使用单一技术，而是根据需要将硬件、嵌入式软件和自动化层结合起来，打造端到端可运行的解决方案。</li><li><strong>语言能力：</strong>土耳其语（母语）、英语（工作熟练程度）、德语（学习中）。</li></ul>",
+      proj_sec_label: "02 / 项目（摘要）",
+      proj_sec_title: "精选 <em>作品</em>",
+      proj_cta: "查看 PDF 报告",
+      proj_all_btn: "查看所有项目 &rarr;",
+      gal_sec_label: "03 / 画廊（摘要）",
+      gal_sec_title: "即时 <em>镜头</em>",
+      gal_all: "查看全部",
+      gal_all_btn: "前往完整画廊 &rarr;",
+      contact_label: "05 / 联系",
+      contact_title: "建立 <em>联系</em>",
+      contact_lead: "无论是埃斯基谢希尔还是土耳其全境的工程项目、技术问题或合作事宜，都可以通过以下渠道与我联系。",
+      c_note: "// 我可能并非随时都方便接听电话",
+      footer_copy: "© 2026 Volkan Tuncer — 卡拉比克大学 · 机电工程",
+      footer_sys: "系统在线"
+    }
+  };
+
+  function setLanguage(lang) {
+    localStorage.setItem('lang', lang);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[lang] && dict[lang][key]) el.innerHTML = dict[lang][key];
+    });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+      });
   }
 
-  document.addEventListener('click', e => {
-    const link = e.target.closest('a[href]');
-    if (!link) return;
-    const href = link.getAttribute('href');
-    if (!href || link.target === '_blank') return;
-    if (/^(mailto:|tel:|javascript:)/i.test(href)) return;
-
-    const normalize = p => p.replace(/\/index\.html$/i, '/').replace(/\/+$/, '') || '/';
-    if (link.host === location.host && normalize(link.pathname) === normalize(location.pathname)) {
-      return;
-    }
-    stopAllLoops();
-  }, { capture: true });
-
-  window.addEventListener('pagehide', stopAllLoops);
-});
-
-/* ══════════════════════════════════════════
- * 5. ÇEVİRİ SÖZLÜĞÜ (i18n)
- * ══════════════════════════════════════════ */
-const dict = {
-  tr: {
-    nav_chip: "MKT · ENG",
-    nav_home: "Anasayfa",
-    nav_about: "Hakkımda",
-    nav_projects: "Projeler",
-    nav_gallery: "Galeri",
-    nav_blog: "Blog",
-    nav_contact: "İletişim",
-    hero_status: "Hoşgeldiniz &nbsp;—&nbsp; MEKATRONİK MÜHENDİSİ",
-    hero_desc: "Teknolojinin yalnızca nasıl çalıştığını değil, nasıl bir sisteme dönüştürülebileceğini anlamaya odaklanıyorum. Devrelerden yazılıma, otomasyondan sistem entegrasyonuna kadar farklı disiplinleri bir araya getirerek teknik çözümleri yönetilebilir ve sürdürülebilir yapılara dönüştürüyorum. Eskişehir merkezli yürütmeyi hedeflediğim mühendislik vizyonumla; doğru teknolojiyi seçmek, doğru kaynakları bir araya getirmek ve ölçülebilir sonuçlar üretmek üzerine çalışıyorum.",
-    hero_btn1: "Projeleri İncele",
-    hero_btn2: "İletişim Kur &rarr;",
-    about_label: "01 / Hakkımda",
-    about_title: "Nasıl <em>Biri?</em>",
-    about_p1: "Küçüklüğümden beri bir şeylerin nasıl çalıştığına dair merakım hiç bitmedi. Bir sistemi oluşturan parçaların nasıl bir araya geldiğini anlamak ve onları birlikte çalışırken görmek her zaman ilgimi çekti. Mekatronik mühendisliği de bu merakın doğal karşılığı oldu — elektronik, mekanik ve yazılımın kesişiminde çalışmak bana hem mantıklı hem de doğal geliyor. Zamanla bu merak, yalnızca sistemleri anlamaktan çok, onları bir bütün olarak düşünmeye ve ortaya çıkan sonucu yönetmeye dönüştü.",
-    about_p2: "<p>Multidisipliner bir yaklaşımla; gömülü sistemler, donanım tasarımı ve yazılım geliştirme alanlarını uçtan uca entegre eden sistem odaklı bir mühendisim.</p><ul class='about-highlights'><li><strong>Yazılım &amp; Sistemler:</strong> C ve Python odaklı mimariler, ileri seviye Linux ekosistemi ve Selenium otomasyonları.</li><li><strong>Gömülü &amp; Tasarım:</strong> KiCad ile PCB tasarımı, SolidWorks ile mekanik modelleme, gömülü C programlama, Arduino ve Raspberry Pi mimarileri.</li><li><strong>Sistem Entegrasyonu:</strong> Münferit teknolojileri tek başına kullanmak yerine; donanım, gömülü yazılım ve otomasyon katmanlarını ihtiyaca uygun şekilde bir araya getirerek uçtan uca çalışan çözümler üretme yaklaşımı.</li><li><strong>Dil Yeterlilikleri:</strong> Türkçe (Ana Dil), İngilizce (Aktif / İş Düzeyi), Almanca (Öğrenim Aşamasında).</li></ul>",
-    proj_sec_label: "02 / Projeler (Özet)",
-    proj_sec_title: "Öne Çıkan <em>Çalışmalar</em>",
-    proj_cta: "PDF Raporunu Gör",
-    proj_all_btn: "Tüm Projeleri Gör &rarr;",
-    gal_sec_label: "03 / Galeri (Özet)",
-    gal_sec_title: "Anlık <em>Kareler</em>",
-    gal_all: "Tümünü Gör",
-    gal_all_btn: "Galerinin Tamamına Git &rarr;",
-    contact_label: "05 / İletişim",
-    contact_title: "Bağlantı <em>Kurun</em>",
-    contact_lead: "Eskişehir veya Türkiye genelinde mühendislik projeleri, teknik sorular veya iş birlikleri için aşağıdaki kanallardan ulaşabilirsiniz.",
-    c_note: "// Sesli aramaya her zaman hazır olmayabilirim",
-    footer_copy: "© 2026 Volkan Tuncer — Karabük Üniversitesi · Mekatronik Mühendisliği",
-    footer_sys: "sistem aktif"
-  },
-  en: {
-    nav_chip: "MCH · ENG",
-    nav_home: "Home",
-    nav_about: "About",
-    nav_projects: "Projects",
-    nav_gallery: "Gallery",
-    nav_blog: "Blog",
-    nav_contact: "Contact",
-    hero_status: "Welcome &nbsp;—&nbsp; MECHATRONICS ENGINEER",
-    hero_desc: "I focus on understanding not just how technology works, but how it can be turned into a complete system. By bringing together disciplines from circuits to software, from automation to system integration, I turn technical solutions into manageable, sustainable structures. With an engineering vision centered in Eskişehir, I work on choosing the right technology, bringing together the right resources, and producing measurable results.",
-    hero_btn1: "View Projects",
-    hero_btn2: "Get in Touch &rarr;",
-    about_label: "01 / About Me",
-    about_title: "Who am <em>I?</em>",
-    about_p1: "My curiosity about how things work has never faded since childhood. Understanding how the parts that make up a system come together, and seeing them work in harmony, has always fascinated me. Mechatronics engineering became the natural answer to that curiosity — working at the intersection of electronics, mechanics, and software feels both logical and natural to me. Over time, this curiosity evolved from simply understanding systems into thinking of them as a whole and managing the outcome.",
-    about_p2: "<p>With a multidisciplinary approach, I am a systems-focused engineer who integrates embedded systems, hardware design, and software development end to end.</p><ul class='about-highlights'><li><strong>Software &amp; Systems:</strong> C and Python-focused architectures, an advanced Linux ecosystem, and Selenium automation.</li><li><strong>Embedded &amp; Design:</strong> PCB design with KiCad, mechanical modeling with SolidWorks, embedded C programming, and Arduino / Raspberry Pi architectures.</li><li><strong>System Integration:</strong> Rather than using individual technologies in isolation, an approach that brings together hardware, embedded software, and automation layers as needed to produce end-to-end working solutions.</li><li><strong>Language Skills:</strong> Turkish (Native), English (Active / Working Proficiency), German (Currently Learning).</li></ul>",
-    proj_sec_label: "02 / Projects (Summary)",
-    proj_sec_title: "Featured <em>Works</em>",
-    proj_cta: "View PDF Report",
-    proj_all_btn: "View All Projects &rarr;",
-    gal_sec_label: "03 / Gallery (Summary)",
-    gal_sec_title: "Instant <em>Frames</em>",
-    gal_all: "View All",
-    gal_all_btn: "Go to Full Gallery &rarr;",
-    contact_label: "05 / Contact",
-    contact_title: "Establish <em>Connection</em>",
-    contact_lead: "You can reach me through the channels below for engineering projects, technical questions, or collaborations across Eskişehir or Turkey.",
-    c_note: "// I may not always be available for voice calls",
-    footer_copy: "© 2026 Volkan Tuncer — Karabuk University · Mechatronics Engineering",
-    footer_sys: "system active"
-  },
-  de: {
-    nav_chip: "MCH · ING",
-    nav_home: "Startseite",
-    nav_about: "Über mich",
-    nav_projects: "Projekte",
-    nav_gallery: "Galerie",
-    nav_blog: "Blog",
-    nav_contact: "Kontakt",
-    hero_status: "Willkommen &nbsp;—&nbsp; MECHATRONIK-INGENIEUR",
-    hero_desc: "Ich konzentriere mich darauf, nicht nur zu verstehen, wie Technologie funktioniert, sondern wie sie in ein vollständiges System verwandelt werden kann. Indem ich Disziplinen von Schaltkreisen bis Software, von Automatisierung bis Systemintegration zusammenbringe, verwandle ich technische Lösungen in handhabbare und nachhaltige Strukturen. Mit einer ingenieurtechnischen Vision mit Schwerpunkt Eskişehir arbeite ich daran, die richtige Technologie auszuwählen, die richtigen Ressourcen zusammenzubringen und messbare Ergebnisse zu erzielen.",
-    hero_btn1: "Projekte Ansehen",
-    hero_btn2: "Kontakt Aufnehmen &rarr;",
-    about_label: "01 / Über mich",
-    about_title: "Wer bin <em>ich?</em>",
-    about_p1: "Meine Neugier, wie Dinge funktionieren, ist seit meiner Kindheit nie erloschen. Zu verstehen, wie die Teile eines Systems zusammenkommen, und zu sehen, wie sie gemeinsam funktionieren, hat mich immer fasziniert. Mechatronik-Ingenieurwesen wurde die natürliche Antwort auf diese Neugier — an der Schnittstelle von Elektronik, Mechanik und Software zu arbeiten fühlt sich für mich logisch und natürlich an. Mit der Zeit entwickelte sich diese Neugier vom bloßen Verstehen von Systemen zu einem ganzheitlichen Denken und der Steuerung des Ergebnisses.",
-    about_p2: "<p>Mit einem multidisziplinären Ansatz bin ich ein systemorientierter Ingenieur, der eingebettete Systeme, Hardwaredesign und Softwareentwicklung durchgängig integriert.</p><ul class='about-highlights'><li><strong>Software &amp; Systeme:</strong> C- und Python-orientierte Architekturen, ein fortgeschrittenes Linux-Ökosystem und Selenium-Automatisierungen.</li><li><strong>Embedded &amp; Design:</strong> PCB-Design mit KiCad, mechanische Modellierung mit SolidWorks, eingebettete C-Programmierung sowie Arduino- und Raspberry-Pi-Architekturen.</li><li><strong>Systemintegration:</strong> Statt einzelne Technologien isoliert einzusetzen, ein Ansatz, der Hardware-, Embedded-Software- und Automatisierungsebenen bedarfsgerecht zusammenführt, um durchgängig funktionierende Lösungen zu schaffen.</li><li><strong>Sprachkenntnisse:</strong> Türkisch (Muttersprache), Englisch (Aktiv / Berufliches Niveau), Deutsch (In Ausbildung).</li></ul>",
-    proj_sec_label: "02 / Projekte (Zusammenfassung)",
-    proj_sec_title: "Ausgewählte <em>Arbeiten</em>",
-    proj_cta: "PDF-Bericht Ansehen",
-    proj_all_btn: "Alle Projekte Ansehen &rarr;",
-    gal_sec_label: "03 / Galerie (Zusammenfassung)",
-    gal_sec_title: "Momentaufnahmen",
-    gal_all: "Alle Ansehen",
-    gal_all_btn: "Zur Vollständigen Galerie &rarr;",
-    contact_label: "05 / Kontakt",
-    contact_title: "Verbindung <em>Herstellen</em>",
-    contact_lead: "Für Ingenieurprojekte, technische Fragen oder Kooperationen in Eskişehir oder in ganz Türkei erreichen Sie mich über die folgenden Kanäle.",
-    c_note: "// Für Telefonanrufe bin ich möglicherweise nicht immer erreichbar",
-    footer_copy: "© 2026 Volkan Tuncer — Universität Karabuk · Mechatronik",
-    footer_sys: "system aktiv"
-  },
-  zh: {
-    nav_chip: "机电 · 工程",
-    nav_home: "主页",
-    nav_about: "关于我",
-    nav_projects: "项目",
-    nav_gallery: "画廊",
-    nav_blog: "博客",
-    nav_contact: "联系",
-    hero_status: "欢迎 &nbsp;—&nbsp; 机电工程师",
-    hero_desc: "我关注的不仅是技术如何运作，更是它如何转化为一个完整的系统。通过将电路、软件、自动化和系统集成等不同学科结合起来，我将技术方案转化为可管理、可持续的结构。以埃斯基谢希尔为中心的工程愿景为基础，我致力于选择合适的技术、整合合适的资源，并产出可衡量的成果。",
-    hero_btn1: "查看项目",
-    hero_btn2: "取得联系 &rarr;",
-    about_label: "01 / 关于我",
-    about_title: "我是 <em>谁？</em>",
-    about_p1: "从小到大，我对事物运作原理的好奇心从未停止。理解一个系统的各个部件如何组合在一起，并看着它们协同运作，一直深深吸引着我。机电工程正是这种好奇心的自然归宿——在电子、机械和软件的交汇处工作，对我来说既合乎逻辑又十分自然。随着时间的推移，这种好奇心逐渐从单纯理解系统，发展为将其视为一个整体进行思考，并掌控最终成果。",
-    about_p2: "<p>凭借跨学科的方法，我是一名以系统为核心的工程师，能够端到端地整合嵌入式系统、硬件设计与软件开发。</p><ul class='about-highlights'><li><strong>软件与系统：</strong>以 C 和 Python 为核心的架构、高级 Linux 生态系统以及 Selenium 自动化。</li><li><strong>嵌入式与设计：</strong>使用 KiCad 进行 PCB 设计，使用 SolidWorks 进行机械建模，嵌入式 C 编程，以及 Arduino 和 Raspberry Pi 架构。</li><li><strong>系统集成：</strong>不是孤立地使用单一技术，而是根据需要将硬件、嵌入式软件和自动化层结合起来，打造端到端可运行的解决方案。</li><li><strong>语言能力：</strong>土耳其语（母语）、英语（工作熟练程度）、德语（学习中）。</li></ul>",
-    proj_sec_label: "02 / 项目（摘要）",
-    proj_sec_title: "精选 <em>作品</em>",
-    proj_cta: "查看 PDF 报告",
-    proj_all_btn: "查看所有项目 &rarr;",
-    gal_sec_label: "03 / 画廊（摘要）",
-    gal_sec_title: "即时 <em>镜头</em>",
-    gal_all: "查看全部",
-    gal_all_btn: "前往完整画廊 &rarr;",
-    contact_label: "05 / 联系",
-    contact_title: "建立 <em>联系</em>",
-    contact_lead: "无论是埃斯基谢希尔还是土耳其全境的工程项目、技术问题或合作事宜，都可以通过以下渠道与我联系。",
-    c_note: "// 我可能并非随时都方便接听电话",
-    footer_copy: "© 2026 Volkan Tuncer — 卡拉比克大学 · 机电工程",
-    footer_sys: "系统在线"
-  }
-};
-
-function setLanguage(lang) {
-  localStorage.setItem('lang', lang);
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (dict[lang] && dict[lang][key]) el.innerHTML = dict[lang][key];
-  });
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.addEventListener('click', e => {
+      const btn = e.target.closest('.lang-btn');
+      if (btn) setLanguage(btn.getAttribute('data-lang'));
     });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.body.addEventListener('click', e => {
-    const btn = e.target.closest('.lang-btn');
-    if (btn) setLanguage(btn.getAttribute('data-lang'));
-  });
-    const savedLang = localStorage.getItem('lang') || 'tr';
-    setLanguage(savedLang);
-});
-
-/* ══════════════════════════════════════════
- * 6. TERMINAL & ARCADE MOTORU
- * ═ *══*═══════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-  const termBody = document.querySelector('.hero-terminal .term-body');
-  if (!termBody) return;
-
-  termBody.querySelectorAll('.cursor-blink, .interactive-row').forEach(el => {
-    const parentLine = el.closest('.tl');
-    if (parentLine) parentLine.remove();
+      const savedLang = localStorage.getItem('lang') || 'tr';
+      setLanguage(savedLang);
   });
 
-    const inputRow = document.createElement('div');
-    inputRow.className = 'tl interactive-row';
-    inputRow.style.cssText = 'display:flex; align-items:center;';
-    inputRow.innerHTML = `
-    <span class="tl-prompt">volkan@kbu:~$</span>
-    <div class="term-input-container" style="display:flex; align-items:center; flex:1; margin-left:6px; position:relative;">
-    <span class="term-typed-text" style="color:var(--fg); font-family:var(--mono); font-size:0.7rem; white-space:pre;"></span>
-    <span class="term-custom-cursor" style="display:inline-block; width:7px; height:13px; background:var(--cyan); margin-left:1px; vertical-align:text-bottom; box-shadow:0 0 10px var(--cyan); animation: cblink 1s step-start infinite;"></span>
-    <input type="text" class="term-input" autofocus autocomplete="off" spellcheck="false" style="position:absolute; opacity:0; width:100%; height:100%; border:none; outline:none; cursor:text;" />
-    </div>
-    `;
-    termBody.appendChild(inputRow);
+  /* ══════════════════════════════════════════
+  * 6. TERMINAL & ARCADE MOTORU
+  * ═ *══*═══════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', () => {
+    const termBody = document.querySelector('.hero-terminal .term-body');
+    if (!termBody) return;
 
-    const inputField = inputRow.querySelector('.term-input');
-    const typedTextSpan = inputRow.querySelector('.term-typed-text');
-    let isTerminalLocked = false;
-
-    termBody.addEventListener('click', () => { if (!isTerminalLocked) inputField.focus(); });
-    inputField.addEventListener('input', () => { if (!isTerminalLocked) typedTextSpan.textContent = inputField.value; });
-
-    inputField.addEventListener('keydown', (e) => {
-      if (isTerminalLocked) { e.preventDefault(); return; }
-
-      if (e.key === 'Enter') {
-        const cmd = inputField.value.trim();
-        const executedRow = document.createElement('div');
-        executedRow.className = 'tl';
-        executedRow.innerHTML = `<span class="tl-prompt">volkan@kbu:~$</span>&nbsp;<span class="tl-cmd" style="color:var(--fg);">${cmd}</span>`;
-        termBody.insertBefore(executedRow, inputRow);
-
-        const outputRow = document.createElement('div');
-        outputRow.className = 'tl';
-        outputRow.style.color = 'var(--fg2)';
-        const lowerCmd = cmd.toLowerCase();
-
-        if (lowerCmd === 'help') {
-          outputRow.innerHTML = `<span class="tl-out">Komutlar: <span style="color:var(--amber)">contact, pacman, matrix, hack, whoami, skills, clear, reboot</span></span>`;
-        } else if (lowerCmd === 'whoami') {
-          outputRow.innerHTML = `<span class="tl-out">volkan_tuncer — Mekatronik Mühendisi</span>`;
-        } else if (lowerCmd === 'skills') {
-          outputRow.innerHTML = `<span class="tl-out">Linux (92%), Python (90%), SolidWorks (85%), KiCad (75%), C (65%)</span>`;
-        } else if (lowerCmd === 'contact') {
-          outputRow.innerHTML = `<span class="tl-ok">İletişim paneline gidiliyor...</span>`;
-          setTimeout(() => { document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }, 400);
-        } else if (lowerCmd === 'matrix') {
-          outputRow.innerHTML = `<span class="tl-ok">Matrix protokolü çalıştırılıyor...</span>`;
-          runMatrixRainSmooth();
-        } else if (lowerCmd === 'rm -rf /') {
-          isTerminalLocked = true;
-          inputField.disabled = true;
-          outputRow.innerHTML = `<span style="color:var(--red); font-weight:bold; animation: cblink 0.1s step-start infinite;">[ CRITICAL ] SİSTEM SİLİNİYOR... ROOT ERİŞİMİ SAĞLANDI!</span>`;
-          termBody.insertBefore(outputRow, inputRow);
-          // Yeni satır (log) ekleme kodlarını tamamen sildik. Artık aşağı inme (enter basma) etkisi yok.
-
-          // 1. AŞAMA: Scroll direnci ve Ekran Sallantısı (Jitter)
-          const crazyScroll = (e) => {
-            e.preventDefault();
-            window.scrollBy((Math.random() - 0.5) * 50, (Math.random() - 0.5) * 50);
-          };
-          window.addEventListener('wheel', crazyScroll, { passive: false });
-          window.addEventListener('touchmove', crazyScroll, { passive: false });
-
-          const style = document.createElement('style');
-          style.innerHTML = `@keyframes crashShake { 0% { transform: translate(3px, 2px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -2px) rotate(-1deg); } 60% { transform: translate(-3px, 2px) rotate(0deg); } 80% { transform: translate(3px, -1px) rotate(1deg); } 100% { transform: translate(-1px, 2px) rotate(-1deg); } }`;
-          document.head.appendChild(style);
-          document.body.style.animation = 'crashShake 0.1s infinite';
-
-          // 2. AŞAMA: Düzeni BOZMADAN çok hızlıca olduğu yerde silikleşme
-          const allElements = document.querySelectorAll('h1, h2, h3, p, img, a, span:not(.term-typed-text), li, .proj-card, .c-card, .gi, .tag');
-
-          // Sadece opacity ve blur kullanıyoruz, scale/transform YOK. Yeri asla değişmez.
-          allElements.forEach(el => {
-            el.style.transition = 'opacity 0.4s ease, filter 0.4s ease';
-          });
-
-          const chaosInterval = setInterval(() => {
-            const randomEl = allElements[Math.floor(Math.random() * allElements.length)];
-
-            if (randomEl && randomEl.style.opacity !== '0') {
-              randomEl.style.opacity = '0';
-              randomEl.style.filter = 'blur(10px)';
-              randomEl.style.pointerEvents = 'none';
-            }
-
-            // Arka plan hızlıca siyah-kırmızı titreşir
-            document.body.style.backgroundColor = Math.random() > 0.5 ? '#110000' : '#000000';
-          }, 5); // Aşırı hızlı silinmesi için süreyi 5ms'ye çektim
-
-          // 3. AŞAMA: Siyah Arka Plan & Kırmızı KERNEL PANIC (2 Saniye Sonra)
-          setTimeout(() => {
-            clearInterval(chaosInterval);
-            window.removeEventListener('wheel', crazyScroll);
-            window.removeEventListener('touchmove', crazyScroll);
-
-            document.body.style.animation = 'none';
-            document.body.style.transition = 'none';
-            document.body.style.transform = 'none';
-            document.body.style.filter = 'none';
-
-            document.body.innerHTML = `
-            <div style="background-color: #000000; color: #ff0000; font-family: 'Courier New', Courier, monospace; height: 100vh; width: 100vw; display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; z-index: 99999999; padding: 5vw; box-sizing: border-box; text-align: center; overflow: hidden;">
-            <h1 style="color: #ff0000; font-size: clamp(3rem, 10vw, 7rem); letter-spacing: 5px; margin-bottom: 20px; text-shadow: 0 0 20px #ff0000; text-transform: uppercase;">Kernel Panic</h1>
-
-            <p style="font-size: clamp(1.2rem, 4vw, 2.5rem); margin-bottom: 30px; font-weight: bold; text-shadow: 0 0 10px #ff0000;">*** FATAL EXCEPTION: SYSTEM DESTROYED ***</p>
-
-            <p style="font-size: 1.2rem; margin-bottom: 10px; color: #dd0000;">VFS: Unable to mount root fs on unknown-block(0,0)</p>
-            <p style="font-size: 1.2rem; margin-bottom: 40px; color: #dd0000;">All data on volume '/' has been completely erased.</p>
-
-            <p style="font-size: 1.8rem; margin-top: 30px; font-weight: bold;">System Halted.</p>
-            <p style="font-size: 1rem; margin-top: 20px; color: #550000;">(Press F5 to reboot... if you still can)</p>
-            <p style="font-size: 3rem; margin-top: 20px; animation: blink 0.5s step-start infinite;">_</p>
-            </div>
-            <style>@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }</style>
-            `;
-          }, 2000); // 5.5 saniye olan süreyi çok hızlı olması için 2 saniyeye indirdim
-
-          inputField.value = '';
-          typedTextSpan.textContent = '';
-          return;
-        } else if (lowerCmd === 'hack') {
-          isTerminalLocked = true;
-          inputField.disabled = true;
-          outputRow.innerHTML = `<span style="color:var(--red)">[ UYARI ] NASA ana sunucusuna sızılıyor... Uydu kodları indiriliyor...</span>`;
-          termBody.insertBefore(outputRow, inputRow);
-          termBody.scrollTop = termBody.scrollHeight;
-
-          setTimeout(() => {
-            const jokeRow = document.createElement('div');
-            jokeRow.className = 'tl';
-            jokeRow.style.color = 'var(--fg2)';
-            jokeRow.innerHTML = `<span style="color:var(--amber)">[ BİLGİ ] Şaka şaka, sistem güvende! 🤖</span>`;
-            termBody.insertBefore(jokeRow, inputRow);
-            termBody.scrollTop = termBody.scrollHeight;
-            isTerminalLocked = false;
-            inputField.disabled = false;
-            inputField.focus();
-          }, 2500);
-
-          inputField.value = '';
-          typedTextSpan.textContent = '';
-          return;
-        } else if (lowerCmd === 'pacman') {
-          outputRow.innerHTML = `<span class="tl-ok">noluyo haha! Pacman avı başladı... 🟡</span>`;
-          runBalancedPacman();
-        } else if (lowerCmd === 'date') {
-          outputRow.innerHTML = `<span class="tl-out">${new Date().toLocaleString()}</span>`;
-        } else if (lowerCmd === 'clear') {
-          termBody.querySelectorAll('.tl:not(.interactive-row)').forEach(el => el.remove());
-          outputRow.remove();
-        } else if (lowerCmd === 'reboot') {
-          outputRow.innerHTML = `<span class="tl-ok">Sistem yeniden başlatılıyor...</span>`;
-          setTimeout(() => location.reload(), 1000);
-        } else if (cmd === '') {
-          outputRow.remove();
-        } else {
-          outputRow.innerHTML = `<span style="color:var(--red)">Komut bulunamadı: ${cmd}, deneyebilirsiniz: help</span>`;
-        }
-
-        if (cmd !== 'clear' && cmd !== '') termBody.insertBefore(outputRow, inputRow);
-        inputField.value = '';
-        typedTextSpan.textContent = '';
-        termBody.scrollTop = termBody.scrollHeight;
-      }
+    termBody.querySelectorAll('.cursor-blink, .interactive-row').forEach(el => {
+      const parentLine = el.closest('.tl');
+      if (parentLine) parentLine.remove();
     });
 
-    function runMatrixRainSmooth() {
-      const canvas = document.createElement('canvas');
-      canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;pointer-events:none;transition:opacity 2s ease;opacity:1;';
-      document.body.appendChild(canvas);
-
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^*()+-<>?アカサタナハマヤラワ';
-      const fontSize = 16;
-      const columns = canvas.width / fontSize;
-      const rainDrops = new Array(Math.floor(columns)).fill(1);
-
-      const matrixInterval = setInterval(() => {
-        ctx.fillStyle = 'rgba(5, 7, 10, 0.08)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#00ff88';
-        ctx.font = fontSize + 'px monospace';
-
-        for (let i = 0; i < rainDrops.length; i++) {
-          const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-          ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
-          if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) rainDrops[i] = 0;
-          rainDrops[i]++;
-        }
-      }, 30);
-
-      setTimeout(() => {
-        canvas.style.opacity = '0';
-        setTimeout(() => { clearInterval(matrixInterval); canvas.remove(); }, 2000);
-      }, 5000);
-    }
-
-    function runBalancedPacman() {
-      const dotContainer = document.createElement('div');
-      dotContainer.style.cssText = 'position:fixed;top:43vh;left:5vw;width:90vw;display:flex;justify-content:space-between;z-index:99997;pointer-events:none;';
-
-      const dots = [];
-      for (let i = 0; i < 25; i++) {
-        const dot = document.createElement('span');
-        dot.innerHTML = '·';
-        dot.style.cssText = 'color:var(--amber);font-size:45px;text-shadow:0 0 10px var(--amber);';
-        dotContainer.appendChild(dot);
-        dots.push(dot);
-      }
-      document.body.appendChild(dotContainer);
-
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'position:fixed;top:41vh;left:-180px;font-size:75px;z-index:99999;display:flex;align-items:center;gap:20px;pointer-events:none;transition:left 6s linear;';
-      wrapper.innerHTML = `
-      <span style="font-size:55px; filter:drop-shadow(0 0 10px #ff4444);">👻</span>
-      <span class="pac-face" style="color:#ffb830; text-shadow:0 0 20px #ffb830; font-weight:bold; line-height:1;">C</span>
+      const inputRow = document.createElement('div');
+      inputRow.className = 'tl interactive-row';
+      inputRow.style.cssText = 'display:flex; align-items:center;';
+      inputRow.innerHTML = `
+      <span class="tl-prompt">volkan@kbu:~$</span>
+      <div class="term-input-container" style="display:flex; align-items:center; flex:1; margin-left:6px; position:relative;">
+      <span class="term-typed-text" style="color:var(--fg); font-family:var(--mono); font-size:0.7rem; white-space:pre;"></span>
+      <span class="term-custom-cursor" style="display:inline-block; width:7px; height:13px; background:var(--cyan); margin-left:1px; vertical-align:text-bottom; box-shadow:0 0 10px var(--cyan); animation: cblink 1s step-start infinite;"></span>
+      <input type="text" class="term-input" autofocus autocomplete="off" spellcheck="false" style="position:absolute; opacity:0; width:100%; height:100%; border:none; outline:none; cursor:text;" />
+      </div>
       `;
-      document.body.appendChild(wrapper);
+      termBody.appendChild(inputRow);
 
-      const face = wrapper.querySelector('.pac-face');
-      let isOpen = false;
-      const chompTimer = setInterval(() => {
-        face.innerHTML = isOpen ? 'O' : 'C';
-        isOpen = !isOpen;
-      }, 180);
+      const inputField = inputRow.querySelector('.term-input');
+      const typedTextSpan = inputRow.querySelector('.term-typed-text');
+      let isTerminalLocked = false;
 
-      setTimeout(() => { wrapper.style.left = '105vw'; }, 50);
+      termBody.addEventListener('click', () => { if (!isTerminalLocked) inputField.focus(); });
+      inputField.addEventListener('input', () => { if (!isTerminalLocked) typedTextSpan.textContent = inputField.value; });
 
-      const logicInterval = setInterval(() => {
-        const pacRect = face.getBoundingClientRect();
-        dots.forEach(dot => {
-          const dotRect = dot.getBoundingClientRect();
-          if (dotRect.right >= pacRect.left && dotRect.left <= pacRect.right) {
-            dot.style.opacity = '0';
+      inputField.addEventListener('keydown', (e) => {
+        if (isTerminalLocked) { e.preventDefault(); return; }
+
+        if (e.key === 'Enter') {
+          const cmd = inputField.value.trim();
+          const executedRow = document.createElement('div');
+          executedRow.className = 'tl';
+          executedRow.innerHTML = `<span class="tl-prompt">volkan@kbu:~$</span>&nbsp;<span class="tl-cmd" style="color:var(--fg);">${cmd}</span>`;
+          termBody.insertBefore(executedRow, inputRow);
+
+          const outputRow = document.createElement('div');
+          outputRow.className = 'tl';
+          outputRow.style.color = 'var(--fg2)';
+          const lowerCmd = cmd.toLowerCase();
+
+          if (lowerCmd === 'help') {
+            outputRow.innerHTML = `<span class="tl-out">Komutlar: <span style="color:var(--amber)">contact, pacman, matrix, hack, whoami, skills, clear, reboot</span></span>`;
+          } else if (lowerCmd === 'whoami') {
+            outputRow.innerHTML = `<span class="tl-out">volkan_tuncer — Mekatronik Mühendisi</span>`;
+          } else if (lowerCmd === 'skills') {
+            outputRow.innerHTML = `<span class="tl-out">Linux (92%), Python (90%), SolidWorks (85%), KiCad (75%), C (65%)</span>`;
+          } else if (lowerCmd === 'contact') {
+            outputRow.innerHTML = `<span class="tl-ok">İletişim paneline gidiliyor...</span>`;
+            setTimeout(() => { document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }, 400);
+          } else if (lowerCmd === 'matrix') {
+            outputRow.innerHTML = `<span class="tl-ok">Matrix protokolü çalıştırılıyor...</span>`;
+            runMatrixRainSmooth();
+          } else if (lowerCmd === 'rm -rf /') {
+            isTerminalLocked = true;
+            inputField.disabled = true;
+            outputRow.innerHTML = `<span style="color:var(--red); font-weight:bold; animation: cblink 0.1s step-start infinite;">[ CRITICAL ] SİSTEM SİLİNİYOR... ROOT ERİŞİMİ SAĞLANDI!</span>`;
+            termBody.insertBefore(outputRow, inputRow);
+            // Yeni satır (log) ekleme kodlarını tamamen sildik. Artık aşağı inme (enter basma) etkisi yok.
+
+            // 1. AŞAMA: Scroll direnci ve Ekran Sallantısı (Jitter)
+            const crazyScroll = (e) => {
+              e.preventDefault();
+              window.scrollBy((Math.random() - 0.5) * 50, (Math.random() - 0.5) * 50);
+            };
+            window.addEventListener('wheel', crazyScroll, { passive: false });
+            window.addEventListener('touchmove', crazyScroll, { passive: false });
+
+            const style = document.createElement('style');
+            style.innerHTML = `@keyframes crashShake { 0% { transform: translate(3px, 2px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -2px) rotate(-1deg); } 60% { transform: translate(-3px, 2px) rotate(0deg); } 80% { transform: translate(3px, -1px) rotate(1deg); } 100% { transform: translate(-1px, 2px) rotate(-1deg); } }`;
+            document.head.appendChild(style);
+            document.body.style.animation = 'crashShake 0.1s infinite';
+
+            // 2. AŞAMA: Düzeni BOZMADAN çok hızlıca olduğu yerde silikleşme
+            const allElements = document.querySelectorAll('h1, h2, h3, p, img, a, span:not(.term-typed-text), li, .proj-card, .c-card, .gi, .tag');
+
+            // Sadece opacity ve blur kullanıyoruz, scale/transform YOK. Yeri asla değişmez.
+            allElements.forEach(el => {
+              el.style.transition = 'opacity 0.4s ease, filter 0.4s ease';
+            });
+
+            const chaosInterval = setInterval(() => {
+              const randomEl = allElements[Math.floor(Math.random() * allElements.length)];
+
+              if (randomEl && randomEl.style.opacity !== '0') {
+                randomEl.style.opacity = '0';
+                randomEl.style.filter = 'blur(10px)';
+                randomEl.style.pointerEvents = 'none';
+              }
+
+              // Arka plan hızlıca siyah-kırmızı titreşir
+              document.body.style.backgroundColor = Math.random() > 0.5 ? '#110000' : '#000000';
+            }, 5); // Aşırı hızlı silinmesi için süreyi 5ms'ye çektim
+
+            // 3. AŞAMA: Siyah Arka Plan & Kırmızı KERNEL PANIC (2 Saniye Sonra)
+            setTimeout(() => {
+              clearInterval(chaosInterval);
+              window.removeEventListener('wheel', crazyScroll);
+              window.removeEventListener('touchmove', crazyScroll);
+
+              document.body.style.animation = 'none';
+              document.body.style.transition = 'none';
+              document.body.style.transform = 'none';
+              document.body.style.filter = 'none';
+
+              document.body.innerHTML = `
+              <div style="background-color: #000000; color: #ff0000; font-family: 'Courier New', Courier, monospace; height: 100vh; width: 100vw; display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; z-index: 99999999; padding: 5vw; box-sizing: border-box; text-align: center; overflow: hidden;">
+              <h1 style="color: #ff0000; font-size: clamp(3rem, 10vw, 7rem); letter-spacing: 5px; margin-bottom: 20px; text-shadow: 0 0 20px #ff0000; text-transform: uppercase;">Kernel Panic</h1>
+
+              <p style="font-size: clamp(1.2rem, 4vw, 2.5rem); margin-bottom: 30px; font-weight: bold; text-shadow: 0 0 10px #ff0000;">*** FATAL EXCEPTION: SYSTEM DESTROYED ***</p>
+
+              <p style="font-size: 1.2rem; margin-bottom: 10px; color: #dd0000;">VFS: Unable to mount root fs on unknown-block(0,0)</p>
+              <p style="font-size: 1.2rem; margin-bottom: 40px; color: #dd0000;">All data on volume '/' has been completely erased.</p>
+
+              <p style="font-size: 1.8rem; margin-top: 30px; font-weight: bold;">System Halted.</p>
+              <p style="font-size: 1rem; margin-top: 20px; color: #550000;">(Press F5 to reboot... if you still can)</p>
+              <p style="font-size: 3rem; margin-top: 20px; animation: blink 0.5s step-start infinite;">_</p>
+              </div>
+              <style>@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }</style>
+              `;
+            }, 2000); // 5.5 saniye olan süreyi çok hızlı olması için 2 saniyeye indirdim
+
+            inputField.value = '';
+            typedTextSpan.textContent = '';
+            return;
+          } else if (lowerCmd === 'hack') {
+            isTerminalLocked = true;
+            inputField.disabled = true;
+            outputRow.innerHTML = `<span style="color:var(--red)">[ UYARI ] NASA ana sunucusuna sızılıyor... Uydu kodları indiriliyor...</span>`;
+            termBody.insertBefore(outputRow, inputRow);
+            termBody.scrollTop = termBody.scrollHeight;
+
+            setTimeout(() => {
+              const jokeRow = document.createElement('div');
+              jokeRow.className = 'tl';
+              jokeRow.style.color = 'var(--fg2)';
+              jokeRow.innerHTML = `<span style="color:var(--amber)">[ BİLGİ ] Şaka şaka, sistem güvende! 🤖</span>`;
+              termBody.insertBefore(jokeRow, inputRow);
+              termBody.scrollTop = termBody.scrollHeight;
+              isTerminalLocked = false;
+              inputField.disabled = false;
+              inputField.focus();
+            }, 2500);
+
+            inputField.value = '';
+            typedTextSpan.textContent = '';
+            return;
+          } else if (lowerCmd === 'pacman') {
+            outputRow.innerHTML = `<span class="tl-ok">noluyo haha! Pacman avı başladı... 🟡</span>`;
+            runBalancedPacman();
+          } else if (lowerCmd === 'date') {
+            outputRow.innerHTML = `<span class="tl-out">${new Date().toLocaleString()}</span>`;
+          } else if (lowerCmd === 'clear') {
+            termBody.querySelectorAll('.tl:not(.interactive-row)').forEach(el => el.remove());
+            outputRow.remove();
+          } else if (lowerCmd === 'reboot') {
+            outputRow.innerHTML = `<span class="tl-ok">Sistem yeniden başlatılıyor...</span>`;
+            setTimeout(() => location.reload(), 1000);
+          } else if (cmd === '') {
+            outputRow.remove();
+          } else {
+            outputRow.innerHTML = `<span style="color:var(--red)">Komut bulunamadı: ${cmd}, deneyebilirsiniz: help</span>`;
           }
-        });
-      }, 40);
 
-      setTimeout(() => {
-        clearInterval(chompTimer);
-        clearInterval(logicInterval);
-        wrapper.remove();
-        dotContainer.remove();
-      }, 6200);
-    }
-});
+          if (cmd !== 'clear' && cmd !== '') termBody.insertBefore(outputRow, inputRow);
+          inputField.value = '';
+          typedTextSpan.textContent = '';
+          termBody.scrollTop = termBody.scrollHeight;
+        }
+      });
+
+      function runMatrixRainSmooth() {
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;pointer-events:none;transition:opacity 2s ease;opacity:1;';
+        document.body.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^*()+-<>?アカサタナハマヤラワ';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const rainDrops = new Array(Math.floor(columns)).fill(1);
+
+        const matrixInterval = setInterval(() => {
+          ctx.fillStyle = 'rgba(5, 7, 10, 0.08)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#00ff88';
+          ctx.font = fontSize + 'px monospace';
+
+          for (let i = 0; i < rainDrops.length; i++) {
+            const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+            ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) rainDrops[i] = 0;
+            rainDrops[i]++;
+          }
+        }, 30);
+
+        setTimeout(() => {
+          canvas.style.opacity = '0';
+          setTimeout(() => { clearInterval(matrixInterval); canvas.remove(); }, 2000);
+        }, 5000);
+      }
+
+      function runBalancedPacman() {
+        const dotContainer = document.createElement('div');
+        dotContainer.style.cssText = 'position:fixed;top:43vh;left:5vw;width:90vw;display:flex;justify-content:space-between;z-index:99997;pointer-events:none;';
+
+        const dots = [];
+        for (let i = 0; i < 25; i++) {
+          const dot = document.createElement('span');
+          dot.innerHTML = '·';
+          dot.style.cssText = 'color:var(--amber);font-size:45px;text-shadow:0 0 10px var(--amber);';
+          dotContainer.appendChild(dot);
+          dots.push(dot);
+        }
+        document.body.appendChild(dotContainer);
+
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'position:fixed;top:41vh;left:-180px;font-size:75px;z-index:99999;display:flex;align-items:center;gap:20px;pointer-events:none;transition:left 6s linear;';
+        wrapper.innerHTML = `
+        <span style="font-size:55px; filter:drop-shadow(0 0 10px #ff4444);">👻</span>
+        <span class="pac-face" style="color:#ffb830; text-shadow:0 0 20px #ffb830; font-weight:bold; line-height:1;">C</span>
+        `;
+        document.body.appendChild(wrapper);
+
+        const face = wrapper.querySelector('.pac-face');
+        let isOpen = false;
+        const chompTimer = setInterval(() => {
+          face.innerHTML = isOpen ? 'O' : 'C';
+          isOpen = !isOpen;
+        }, 180);
+
+        setTimeout(() => { wrapper.style.left = '105vw'; }, 50);
+
+        const logicInterval = setInterval(() => {
+          const pacRect = face.getBoundingClientRect();
+          dots.forEach(dot => {
+            const dotRect = dot.getBoundingClientRect();
+            if (dotRect.right >= pacRect.left && dotRect.left <= pacRect.right) {
+              dot.style.opacity = '0';
+            }
+          });
+        }, 40);
+
+        setTimeout(() => {
+          clearInterval(chompTimer);
+          clearInterval(logicInterval);
+          wrapper.remove();
+          dotContainer.remove();
+        }, 6200);
+      }
+  });

@@ -104,6 +104,7 @@ body {
   content: '';
   position: absolute;
   inset: -30% 0;
+  background-position: 0 var(--drift-y, 0px);
   background-image:
   radial-gradient(circle at 25% 12%, var(--cyan) 0 1px, transparent 1.7px),
   radial-gradient(circle at 72% 20%, var(--fg) 0 1px, transparent 1.6px),
@@ -122,7 +123,6 @@ body {
   127px 203px;
   opacity: .7;
 }
-
 .side-stars::after {
   inset: -10% 0;
   opacity: .4;
@@ -224,8 +224,8 @@ nav {
   0 0 14px color-mix(in srgb, var(--amber) 55%, transparent);
 }
 @keyframes navCtaShine {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+  50% { filter: hue-rotate(15deg) brightness(1.15); }
 }
 @media (max-width: 900px) {
   .nav-cta-enterprise { margin-left: 6px; padding: 5px 14px; }
@@ -846,12 +846,12 @@ body:not(.site-ready) .reveal { transition: none !important; }
 
 /* ══════════════════════════════════════════
  * ÖZEL İMLEÇ & YILDIZ TOZU (STARDUST) DÜZELTMESİ
- * ========================================================================== */
+/
 #cur-wrap {
 position: fixed;
 inset: 0;
 pointer-events: none;
-z-index: 9999; /* Her şeyin üstünde durması için */
+z-index: 9999;
 }
 
 #cur-dot,
@@ -884,11 +884,12 @@ left: 0;
 pointer-events: none;
 }
 
-/* Custom Elementlerin blok yapısını garantiye alalım */
+
 site-header,
 site-footer {
   display: block;
 }
+* ========================================================================== */
 
 /* ==========================================================================
  *  GLOBAL MOBİL OPTİMİZASYON (768px ve altı)
@@ -896,10 +897,36 @@ site-footer {
 @media (max-width: 900px) {
   /* 1. HEADER & SANDVİÇ MENÜ DÜZELTMESİ */
   nav { padding: 0 16px; height: 60px; }
-  nav ul, .nav-cta-enterprise { display: none !important; } /* Masaüstü menüyü gizle */
+  nav ul { display: none !important; } /* Sadece masaüstü linkleri gizle, Enterprise butonu geri gelsin */
+  .nav-right .lang-switch { display: none !important; } /* Header'daki eski dil seçeneğini gizle */
   .nav-hamburger { display: flex; } /* Sandviç menüyü göster */
   .nav-right { gap: 10px; }
-  .lang-switch { margin-right: 5px; }
+
+  /* Mobil Menü İçi Dil Seçenekleri Tasarımı */
+  .mobile-lang-switch {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    border-bottom: 1px solid var(--line2);
+  }
+  .mobile-lang-switch .lang-btn {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--fg);
+    background: var(--surface);
+    border: 1px solid var(--line2);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .mobile-lang-switch .lang-btn.active {
+    background: var(--cyan);
+    color: #fff;
+    border-color: var(--cyan);
+    font-weight: 750;
+  }
 
   /* 2. ANA SAYFA HERO BÖLÜMÜ */
   #home {
@@ -963,6 +990,3 @@ site-footer {
 @media (max-width: 420px) {
   .proj-grid { grid-template-columns: 1fr; } /* Çok küçükse tek kolona düşür */
 }
-
-
-

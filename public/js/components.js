@@ -53,6 +53,12 @@ Volkan Tuncer
 </nav>
 
 <div class="nav-mobile-menu" id="mobile-menu">
+<div class="mobile-lang-switch">
+<button class="lang-btn active" data-lang="tr">TR</button>
+<button class="lang-btn" data-lang="en">EN</button>
+<button class="lang-btn" data-lang="de">DE</button>
+<button class="lang-btn" data-lang="zh">ZH</button>
+</div>
 <a href="index.html" data-i18n="nav_home">Anasayfa</a>
 <a href="index.html#about" data-i18n="nav_about">Hakkımda</a>
 <a href="projeler.html" data-i18n="nav_projects">Projeler</a>
