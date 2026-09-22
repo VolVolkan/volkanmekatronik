@@ -411,6 +411,7 @@ body.light-mode .enterprise-page {
   border-bottom: 1px solid var(--vm-line);
   background: rgba(8,18,27,.4);
   transition: background .25s ease;
+  overflow: hidden;
 }
 
 .vm-cap:hover {
@@ -419,10 +420,52 @@ body.light-mode .enterprise-page {
 
 .vm-cap-no {
   position: absolute;
-  top: 30px;
-  right: 30px;
-  color: var(--vm-dim);
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  color: #fff;
+  background: rgba(7,16,24,.55);
+  padding: 4px 8px;
+  backdrop-filter: blur(3px);
   font: 500 .58rem/1 var(--vm-mono);
+}
+
+html[data-theme="light"] .vm-cap-no,
+body.light-mode .vm-cap-no {
+  color: #fff;
+  background: rgba(10,21,31,.55);
+}
+
+.vm-cap-photo {
+  position: relative;
+  width: calc(100% + 62px);
+  height: 170px;
+  margin: -31px -31px 22px;
+  overflow: hidden;
+  background: var(--vm-surface-2);
+}
+
+.vm-cap-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(55%) contrast(1.05) brightness(.92);
+  transform: scale(1.01);
+  transition: filter .35s ease, transform .5s ease;
+}
+
+.vm-cap:hover .vm-cap-photo img {
+  filter: grayscale(0%) contrast(1.02) brightness(1);
+  transform: scale(1.06);
+}
+
+.vm-cap-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7,16,24,0) 45%, rgba(7,16,24,.55) 100%);
+  pointer-events: none;
 }
 
 .vm-cap-icon {
@@ -434,7 +477,11 @@ body.light-mode .enterprise-page {
   border: 1px solid var(--vm-line);
   color: var(--vm-red);
   font: 500 .65rem/1 var(--vm-mono);
-  margin-bottom: 64px;
+  margin-top: -53px;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 3;
+  background: var(--vm-bg);
 }
 
 .vm-cap h3 {
@@ -476,13 +523,44 @@ body.light-mode .enterprise-page {
   border-left: 1px solid var(--vm-line);
 }
 
-.vm-process-line span {
-  color: var(--vm-red);
-  font: 500 .66rem/1 var(--vm-mono);
+.vm-process-photo {
+  position: relative;
+  width: 84px;
+  aspect-ratio: 1 / 1;
+  margin-bottom: 24px;
+  overflow: hidden;
+  border: 1px solid var(--vm-line);
+  background: var(--vm-surface-2);
+}
+
+.vm-process-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(55%) contrast(1.05) brightness(.92);
+  transform: scale(1.01);
+  transition: filter .35s ease, transform .5s ease;
+}
+
+.vm-process-line article:hover .vm-process-photo img {
+  filter: grayscale(0%) contrast(1.02) brightness(1);
+  transform: scale(1.1);
+}
+
+.vm-process-photo span {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background: var(--vm-red);
+  color: #fff;
+  font: 600 .62rem/1 var(--vm-mono);
+  padding: 5px 8px;
 }
 
 .vm-process-line h3 {
-  margin: 45px 0 13px;
+  margin: 0 0 13px;
   font: 700 1rem/1.2 var(--vm-head);
 }
 
@@ -721,6 +799,10 @@ body.light-mode .enterprise-page {
 
   .vm-cap-grid {
     grid-template-columns: 1fr;
+  }
+
+  .vm-cap-photo {
+    height: 200px;
   }
 
   .vm-process-line {

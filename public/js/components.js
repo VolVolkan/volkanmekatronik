@@ -12,7 +12,7 @@ Volkan Tuncer
 </a>
 
 <a href="enterprise.html" class="nav-cta-enterprise">
-<span class="cta-main">Fikrimiz</span>
+<span class="cta-main">İşbirliği</span>
 <span class="cta-sub">Enterprise</span>
 </a>
 </div>
