@@ -719,6 +719,22 @@
             inputField.value = '';
             typedTextSpan.textContent = '';
             return;
+          } else if (/^cd\s*\/?\s*(.+)$/.test(lowerCmd)) {
+            const match = lowerCmd.match(/^cd\s*\/?\s*(.+)$/);
+            let target = match[1].trim();
+
+            // Özel eşlemeler: yazılan kelime farklıysa, gerçek slug'a çevir
+            const aliasMap = {
+              'gallery': 'galeri',
+              'secret': 'gizli'
+              // istersen buraya başka alias'lar da ekleyebilirsin
+            };
+            target = aliasMap[target] || target;
+
+            outputRow.innerHTML = `<span class="tl-ok">Yönlendiriliyor: /${target}...</span>`;
+            setTimeout(() => {
+              window.location.href = `https://volkanmekatronik.com.tr/${target}`;
+            }, 500);
           } else if (lowerCmd === 'pacman') {
             outputRow.innerHTML = `<span class="tl-ok">noluyo haha! Pacman avı başladı... 🟡</span>`;
             runBalancedPacman();

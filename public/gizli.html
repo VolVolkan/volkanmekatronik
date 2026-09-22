@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Dökümanlar — Volkan Tuncer</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/components.js"></script>
+
+  <style>
+    /* ================================
+       DOCUMENTS PAGE
+       ================================ */
+
+    .documents-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    .document-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 290px;
+      padding: 30px;
+      text-decoration: none;
+      color: inherit;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,0.035),
+          rgba(255,255,255,0.012)
+        );
+
+      border: 1px solid var(--line2, rgba(255,255,255,0.08));
+      border-radius: 10px;
+
+      overflow: hidden;
+
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        background 0.25s ease;
+    }
+
+    .document-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--cyan, #5ac8e0),
+        transparent
+      );
+
+      opacity: 0.65;
+    }
+
+    .document-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(90, 200, 224, 0.35);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,0.055),
+          rgba(255,255,255,0.018)
+        );
+    }
+
+    .document-icon {
+      width: 48px;
+      height: 48px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      margin-bottom: 25px;
+
+      border: 1px solid var(--line2, rgba(255,255,255,0.1));
+      border-radius: 8px;
+
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 20px;
+
+      color: var(--cyan, #5ac8e0);
+      background: rgba(90, 200, 224, 0.05);
+    }
+
+    .document-type {
+      margin-bottom: 10px;
+
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+
+      color: var(--cyan, #5ac8e0);
+    }
+
+    .document-title {
+      margin: 0 0 13px;
+
+      font-size: 22px;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    .document-description {
+      margin: 0;
+
+      max-width: 650px;
+
+      font-size: 14px;
+      line-height: 1.7;
+
+      color: var(--muted, rgba(255,255,255,0.62));
+    }
+
+    .document-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-top: auto;
+      padding-top: 25px;
+
+      border-top: 1px solid var(--line2, rgba(255,255,255,0.07));
+    }
+
+    .document-format {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+
+      color: var(--muted, rgba(255,255,255,0.5));
+    }
+
+    .document-open {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      color: var(--cyan, #5ac8e0);
+
+      transition: transform 0.2s ease;
+    }
+
+    .document-card:hover .document-open {
+      transform: translateX(4px);
+    }
+
+    .documents-note {
+      max-width: 1050px;
+      margin: 0 auto 28px;
+
+      padding: 16px 20px;
+
+      border-left: 2px solid var(--cyan, #5ac8e0);
+
+      background: rgba(90, 200, 224, 0.035);
+
+      font-size: 13px;
+      line-height: 1.6;
+
+      color: var(--muted, rgba(255,255,255,0.62));
+    }
+
+    @media (max-width: 700px) {
+      .documents-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .document-card {
+        min-height: 260px;
+        padding: 24px;
+      }
+
+      .document-title {
+        font-size: 19px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="space-canvas"></canvas>
+
+  <div class="side-stars side-stars-left"></div>
+  <div class="side-stars side-stars-right"></div>
+
+  <div class="scroll-progress">
+    <span></span>
+  </div>
+
+  <canvas id="cur-ripple-canvas"></canvas>
+
+  <div id="cur-wrap">
+    <div id="cur-ring"></div>
+    <div id="cur-dot"></div>
+  </div>
+
+  <site-header></site-header>
+
+  <div class="page" style="display:flex; flex-direction:column; min-height:100vh;">
+
+    <div class="page-header reveal d1">
+      <h1>Dökümanlar</h1>
+
+      <p>
+        Bitirme projesi olarak sunduğumuz projelerin açıklayıcı dökümanları
+      </p>
+    </div>
+
+    <section class="section" style="flex:1;">
+
+      <div class="section-inner" style="padding-top:40px;">
+
+        <div class="documents-note reveal d2">
+          Bu bölümde, bitirme projesi dökümanlarını sunuyoruz.
+        </div>
+
+        <div class="documents-grid reveal d3">
+
+          <!-- DOKÜMAN 1 -->
+          <a href="https://drive.google.com/file/d/1c3TlPhqnPI1V1e3hhRpE77LviQrtwXar/view?usp=drive_link" class="document-card">
+
+            <div class="document-icon">
+              &lt;/&gt;
+            </div>
+
+            <span class="document-type">
+              PCB Kart Arıza Bulucu
+            </span>
+
+            <h2 class="document-title">
+              Teknik Proje Dokümantasyonu
+            </h2>
+
+            <p class="document-description">
+              PCB Kartındaki arızaları otonom şekilde kartın her bir bölümünü tarayarak görüntü işleme yardımıyla potansiyel kusurları tespit eden bir makine.
+            </p>
+
+            <div class="document-footer">
+              <span class="document-format">
+                TECHNICAL DOCUMENT
+              </span>
+
+              <span class="document-open">
+                Görüntüle →
+              </span>
+            </div>
+
+          </a>
+
+
+          <!-- DOKÜMAN 2 -->
+          <a href="https://drive.google.com/file/d/1O-LnGnjMzXYyF0rqV8VMifM7ladJclQm/view?usp=drive_link" class="document-card">
+
+            <div class="document-icon">
+              #
+            </div>
+
+            <span class="document-type">
+              Bitirme Projesi
+            </span>
+
+            <h2 class="document-title">
+              Kondisyon bisikleti
+            </h2>
+
+            <p class="document-description">
+              bilimsel yaklaşımlar kullanarak koçluk yapan kullanıcının nabız bilgisini takip ederek egzersizini yönlendiren kondisyon bisikleti eklentisi.
+            </p>
+
+            <div class="document-footer">
+              <span class="document-format">
+                PROJECT REPORT
+              </span>
+
+              <span class="document-open">
+                Görüntüle →
+              </span>
+            </div>
+
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <site-footer></site-footer>
+
+  </div>
+
+  <script src="js/main.js"></script>
+
+</body>
+</html>
